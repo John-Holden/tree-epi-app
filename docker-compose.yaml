@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  front:
+    build: ./front
+
+
+
+  backend:
+      build: ./back
+      volumes:
+        - ./back/src:/tree-epi-back
+      ports:
+      - "5000:5000"
+      entrypoint: ./run_back.sh
+      container_name: tree-epi-back
