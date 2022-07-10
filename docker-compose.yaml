@@ -3,14 +3,17 @@ version: "3"
 services:
   front:
     build: ./front
-
+    volumes:
+      - ./front/app:/tree_epi_front
+    entrypoint: ./run_front.sh
+    container_name: tree-epi-front
+    network_mode: "host"
 
 
   backend:
       build: ./back
       volumes:
         - ./back/src:/tree-epi-back
-      ports:
-      - "5000:5000"
       entrypoint: ./run_back.sh
       container_name: tree-epi-back
+      network_mode: "host"
