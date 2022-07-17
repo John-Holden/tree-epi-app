@@ -5,5 +5,5 @@ __pycache__/
 node_modules
 .idea
 venv
-.mp4
+*.mp4
 .pdf
