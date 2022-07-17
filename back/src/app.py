@@ -49,7 +49,7 @@ def simulation_request_handler():
         simulate(sim_config, save_options, rt_settings)
         logger(' simulation_request_handler', extra={'simulation': 'Success'})
         # TODO placeholder resp for now
-        return make_response(jsonify(message=f'this is what you gave me mofo {sim_config} '), 200)
+        return make_response(jsonify(message=f'The backend is alive! This is what you gave me mofo {sim_config} '), 200)
     except Exception as e:
         logger(f' simulation_request_handler Error - {e}')
         return make_response(jsonify(error=f'{e}'), 500)
