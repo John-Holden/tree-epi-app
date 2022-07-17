@@ -1,22 +1,28 @@
 version: "3"
 
+# VARS DEFINED IN .ENV
+
 services:
   frontend:
     build: ./front
     volumes:
-      - ./front/app:/tree_epi_front
+      - ./front/app:/${FRONTEND_NAME}
+      - ./sim-uploads:/${FRONTEND_NAME}/src/components/media
     entrypoint: ./run_front.sh
-    container_name: tree-epi-front
+    container_name: ${FRONTEND_NAME}
     network_mode: "host"
-
 
   backend:
       build: ./back
       volumes:
-        - ./back/src:/tree-epi-back
+        - ./back/src:/${BACKEND_NAME}
+        - ./sim-uploads:${ANIM_SAVE_DEST}
+
       entrypoint: ./run_back.sh
       environment:
-        - FLASK_ENV=development
-        - PYTHONUNBUFFERED=1
-      container_name: tree-epi-back
+        - FLASK_ENV=${FLASK_ENV}
+        - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
+        - FRAME_SAVE_DEST=${FRAME_SAVE_DEST}
+        - ANIM_SAVE_DEST=${ANIM_SAVE_DEST}
+      container_name: ${BACKEND_NAME}
       network_mode: "host"

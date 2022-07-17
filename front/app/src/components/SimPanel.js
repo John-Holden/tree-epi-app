@@ -3,7 +3,7 @@ import React, { useState, useRef} from 'react';
 
 
 function SimulationPanel() {
-  const simulationPath = './media/sim.mp4'
+  const simulationPath = './media/sim-out.mp4'
   const catImagePath = 'https://tree-epi-site-bucket.s3.etu-west-2.amazonaws.com/Thinking-of-getting-a-cat.png'
 
   const vidRef = useRef(null);

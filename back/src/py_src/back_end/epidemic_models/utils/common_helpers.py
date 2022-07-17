@@ -1,6 +1,8 @@
+from cmath import log
 import os
 import math
 import json
+from jinja2 import UndefinedError
 import numpy as np
 import datetime as dt
 from typing import Optional, List
@@ -158,4 +160,11 @@ def write_SIR_fields(sim_save_loc: str, S: List[np.ndarray], I: List[np.ndarray]
     np.savetxt(f'{sim_save_loc}/I.csv', I_, fmt='%i', delimiter=',')
 
         
-     
+def get_env_var(var: str):
+    if os.environ.get(var) is None:
+        logger(f'[e] Environment variable {var} not defined!')
+        raise Exception(NameError)
+    
+    return os.environ.get(var)
+        
+

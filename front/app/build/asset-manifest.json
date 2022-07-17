@@ -1,12 +1,8 @@
 {
   "files": {
     "main.css": "/static/css/main.95f8d930.css",
-    "main.js": "/static/js/main.3546f562.js",
+    "main.js": "/static/js/main.3efd6010.js",
     "static/js/787.02944742.chunk.js": "/static/js/787.02944742.chunk.js",
-    "static/media/sample-5s-copy1.mp4": "/static/media/sample-5s-copy1.9668a976fd6de4763e1b.mp4",
-    "static/media/sim.mp4": "/static/media/sim.5f55925d87b05fff5ee1.mp4",
-    "static/media/Thinking-of-getting-a-cat.png": "/static/media/Thinking-of-getting-a-cat.3147a978e9546ee0303d.png",
-    "static/media/sim-anim.gif": "/static/media/sim-anim.7c24ad3e1c8094cee161.gif",
     "static/media/KaTeX_AMS-Regular.ttf": "/static/media/KaTeX_AMS-Regular.797708391f0380251e6c.ttf",
     "static/media/KaTeX_Main-Regular.ttf": "/static/media/KaTeX_Main-Regular.c13710b121e1ae9a9d2f.ttf",
     "static/media/KaTeX_Main-Bold.ttf": "/static/media/KaTeX_Main-Bold.741b6dafa705c6d25b25.ttf",
@@ -66,11 +62,11 @@
     "static/media/KaTeX_Size3-Regular.woff2": "/static/media/KaTeX_Size3-Regular.943a01ec6dae1a54fa8b.woff2",
     "index.html": "/index.html",
     "main.95f8d930.css.map": "/static/css/main.95f8d930.css.map",
-    "main.3546f562.js.map": "/static/js/main.3546f562.js.map",
+    "main.3efd6010.js.map": "/static/js/main.3efd6010.js.map",
     "787.02944742.chunk.js.map": "/static/js/787.02944742.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.95f8d930.css",
-    "static/js/main.3546f562.js"
+    "static/js/main.3efd6010.js"
   ]
 }
