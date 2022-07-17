@@ -2,10 +2,12 @@
 Simple flask app to handle incoming simulationrequests
 """
 import os
+import subprocess
 import datetime as dt
 from flask_cors import CORS
 from flask import Flask, jsonify, make_response, request
-from py_src.back_end.epidemic_models.utils.common_helpers import logger
+from matplotlib.ft2font import LOAD_TARGET_LIGHT
+from py_src.back_end.epidemic_models.utils.common_helpers import logger, get_env_var
 from py_src.back_end.epidemic_models.executor import execute_cpp_SIR, get_simulation_config, generic_SIR
 from py_src.params_and_config import (mkdir_tmp_store, GenericSimulationConfig, SaveOptions, RuntimeSettings)
 
@@ -20,10 +22,19 @@ def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_
     """
         Simulate the spread of disease
     """
-    mkdir_tmp_store()
-    # TODO execute compiled c++ version of the algorithm
+    mkdir_tmp_store(get_env_var('FRAME_SAVE_DEST'))
+    ## TODO execute compiled c++ version of the algorithm
     # execute_cpp_SIR(sim_config, save_options, rt_settings)
     generic_SIR(sim_config, save_options, rt_settings)
+
+
+def ffmegp_anim():
+    anim_path = get_env_var('ANIM_SAVE_DEST')
+    frame_path = get_env_var('FRAME_SAVE_DEST')
+    animate_cmd = f'{anim_path}/animate.sh {frame_path} {anim_path}'
+    process = subprocess.Popen(animate_cmd.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    logger(output), logger(error)
 
 
 @app.route("/", methods=['POST'])
@@ -37,7 +48,7 @@ def simulation_request_handler():
     rt_settings.verbosity = 0
     rt_settings.frame_plot = True
     rt_settings.frame_show = False
-    rt_settings.frame_freq = 10
+    rt_settings.frame_freq = 1
     save_options = SaveOptions()
     save_options.frame_save = True
     elapsed = dt.datetime.now() - start
@@ -45,17 +56,12 @@ def simulation_request_handler():
     try:
         simulate(sim_config, save_options, rt_settings)
         logger('[i] Finished succesful simulation')
+        ffmegp_anim()
         return make_response(jsonify(message=f'The backend is alive! This is what you gave me mofo {sim_config} '), 200)
     except Exception as e:
         logger(f'[e] Simulation failed: {e}')
         return make_response(jsonify(error=f'{e}'), 500)
 
-
-@app.route("/test", methods=['GET'])
-def test_route():
-    return make_response(jsonify(message=f'Successful yo'), 200)
-
-
 @app.errorhandler(404)
-def resource_not_found(e):
+def resource_not_found():
     return make_response(jsonify(error='Not found - homie!'), 404)

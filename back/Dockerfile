@@ -1,7 +1,7 @@
 FROM debian:bullseye
 
 RUN apt-get update  && \
-    DEBIAN_FRONTEND=noninteractive apt-get -qq install python3 pip
+    DEBIAN_FRONTEND=noninteractive apt-get -qq install python3 pip ffmpeg 
 
 COPY src/requirements.txt .
 RUN pip install -r requirements.txt

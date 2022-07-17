@@ -196,11 +196,11 @@ def pl_dispersal_func(dist: Union[np.ndarray, float], ell: tuple):
     return (1 + dist/a)**(-b)
 
 
-def mkdir_tmp_store():
-    if os.path.exists(PATH_TO_TEMP):
+def mkdir_tmp_store(location: str):
+    if os.path.exists(location):
         return None
 
-    os.mkdir(PATH_TO_TEMP)
+    os.mkdir(location)
     return True
 
 

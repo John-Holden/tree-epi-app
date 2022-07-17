@@ -45,3 +45,6 @@ follow-logs-back:
 
 follow-logs-front:
 	docker logs --follow tree-epi-front
+
+exec:
+	docker exec -it ${SERVICE} /bin/bash
