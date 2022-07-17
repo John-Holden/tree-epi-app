@@ -46,7 +46,7 @@ def get_simulation_config(sim_params: dict) -> GenericSimulationConfig:
 
 
 def pre_sim_checks(sim_context: GenericSimulationConfig, save_options: SaveOptions):
-    logger.info(' generic_SIR - perfoming pre-sim checks')
+    logger(' generic_SIR - perfoming pre-sim checks')
     if sim_context.dispersal.model_type == 'power_law' and save_options.save_max_d:
         raise Exception('Percolation-like boundary conditions is not valid for power-law based dispersal')
 
@@ -73,32 +73,19 @@ def generic_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions,
 
     try:
         pre_sim_checks(sim_context, save_options)
+        logger(f'[i] Succesful pre-sim checks')
     except Exception as e:
-        logger.info(f'generic_SIR - Failed pre-sim checks')
+        logger(f'Failed pre-sim checks')
         raise e
 
     start = dt.datetime.now()
     sim_result = SIR.run_SIR(sim_context, save_options, runtime_settings)
     elapsed = dt.datetime.now() - start
-    logger.info(f"Termination condition: {sim_result['termination']} "
-                f"Sim steps elapsed: {sim_result['end']}, "
-                f"sim time elapsed: {elapsed} (s)")
+    logger(f"[i] Termination condition: {sim_result['termination']}...\n"
+           f"[i] Sim steps elapsed: {sim_result['end']}...\n"
+           f"[i] Sim time elapsed: {elapsed} (s)...")
     # todo
     #   end_of_sim_plots(sim_context, sim_result, runtime_settings)
-
-
-def generic_SIR_animation(sim_context: GenericSimulationConfig, save_options: SaveOptions, runtime_settings: RuntimeSettings):
-    try:
-        pre_sim_checks(sim_context, save_options)
-    except Exception as e:
-        logger.info(f'generic_SIR - Failed pre-sim checks')
-        raise e
-
-    start = dt.datetime.now()
-    SIR.SIR_function_animate(sim_context, save_options, runtime_settings)
-    elapsed = dt.datetime.now() - start
-    print(f"Simulation finished in {elapsed} (s)")
-    logger.info(f"Simulation finished in {elapsed} (s)")
 
 
 def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, runtime_settings: RuntimeSettings):

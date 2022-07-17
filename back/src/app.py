@@ -21,8 +21,8 @@ def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_
     """
         Simulate the spread of disease
     """
-    return 0
     mkdir_tmp_store()
+    # Todo: execute compiled c++ version of the algorithm
     # execute_cpp_SIR(sim_config, save_options, rt_settings)
     generic_SIR(sim_config, save_options, rt_settings)
 
@@ -42,16 +42,13 @@ def simulation_request_handler():
     save_options = SaveOptions()
     save_options.frame_save = True
     elapsed = dt.datetime.now() - start
-    msg = f' simulation_request_handler - configured & validated params in {elapsed } (s)'
-    logger(msg, extra={'simulation ': 'Begging'})
-
+    logger(f'[i] Configured & validated params in {elapsed } (s)...')
     try:
         simulate(sim_config, save_options, rt_settings)
-        logger(' simulation_request_handler', extra={'simulation': 'Success'})
-        # TODO placeholder resp for now
+        logger('[i] Finished succesful simulation')
         return make_response(jsonify(message=f'The backend is alive! This is what you gave me mofo {sim_config} '), 200)
     except Exception as e:
-        logger(f' simulation_request_handler Error - {e}')
+        logger(f'[e] Simulation failed: {e}')
         return make_response(jsonify(error=f'{e}'), 500)
 
 

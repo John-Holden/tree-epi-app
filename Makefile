@@ -13,7 +13,7 @@ help: ## This help.
 
 
 # Build the containers from scratch
-build: ## Build the release and develoment container. Args: front | backend
+build: ## Build the release and develoment container. Args: frontend | backend
 	docker-compose build --no-cache ${SERVICE}
 
 quick-build:
@@ -29,13 +29,19 @@ stop: ## Stop all docker containers
 	docker-compose stop ${SERVICE}
 
 rebuild-front: ## Rebuild react app, build new image & run frontend container in detached mode
-	make stop SERVICE=front
+	make stop SERVICE=frontend
 	cd front/app/ && yarn build-docker-dev
-	make quick-build SERVICE=front
-	make up SERVICE=front
+	make quick-build SERVICE=frontend
+	make up SERVICE=frontend
 
 rebuild-back:
 	make stop SERVICE=backend
 	cd back/ && make compile_SIR
 	make quick-build SERVICE=backend
 	make up SERVICE=backend
+
+follow-logs-back:
+	docker logs --follow tree-epi-back
+
+follow-logs-front:
+	docker logs --follow tree-epi-front
