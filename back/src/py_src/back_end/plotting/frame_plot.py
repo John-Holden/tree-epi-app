@@ -72,7 +72,7 @@ def SIR_frame(S: List[np.ndarray], I: List[np.ndarray], R: List[np.ndarray], t: 
     save_dest = f'{PATH_TO_TEMP}/{frame_label(t)}.{ext}'
     rho = sim_context.domain_config.tree_density
     alpha = sim_context.domain_config.scale_constant
-    fig, ax = plt.subplots(figsize=(7, 7))
+    _, ax = plt.subplots(figsize=(7, 7))
 
     plt.title(rf'T : {title} | $\rho$ = {rho}, $\alpha$ = {alpha}$m^2$')
     ax.scatter(S[1], S[0], s=Spx, c='green', label=r'$S$', alpha=0.30)

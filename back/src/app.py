@@ -3,7 +3,6 @@ Simple flask app to handle incoming simulationrequests
 """
 import os
 import datetime as dt
-import re
 from flask_cors import CORS
 from flask import Flask, jsonify, make_response, request
 from py_src.back_end.epidemic_models.utils.common_helpers import logger
@@ -22,7 +21,7 @@ def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_
         Simulate the spread of disease
     """
     mkdir_tmp_store()
-    # Todo: execute compiled c++ version of the algorithm
+    # TODO execute compiled c++ version of the algorithm
     # execute_cpp_SIR(sim_config, save_options, rt_settings)
     generic_SIR(sim_config, save_options, rt_settings)
 
@@ -55,7 +54,6 @@ def simulation_request_handler():
 @app.route("/test", methods=['GET'])
 def test_route():
     return make_response(jsonify(message=f'Successful yo'), 200)
-
 
 
 @app.errorhandler(404)
