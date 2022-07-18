@@ -205,7 +205,8 @@ def mkdir_tmp_store(location: str):
 
 
 # --------------Setter functions-------------- #
-def set_dispersal(model: str, ADB_mode: Optional[bool] = False, dispersal_param = None,
+def set_dispersal(model: str, dispersal_param = None,
+                  ADB_mode: Optional[bool] = False,  
                   normed: Optional[bool] = True) -> Dispersal:
     """
     Set the form/config of dispersal
@@ -215,7 +216,6 @@ def set_dispersal(model: str, ADB_mode: Optional[bool] = False, dispersal_param 
     :param dispersal_param: dispersal parameterization
     :return:
     """
-
     model_name = None
     dispersal_function = None
     assert model

@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.integrate import quad
 from typing import Tuple, Optional, Union, List
 from py_src.back_end.epidemic_models.utils.common_helpers import get_initial_host_number
 from py_src.params_and_config import (DomainConfig, Initial_conditions, I_lt,
@@ -266,4 +267,33 @@ def pr_full(S: List[np.ndarray], I: List[np.ndarray],
 
     infected_lt = set_I_lt(infectious_life_time, len(new_I_row), t)
     return (new_I_row, new_I_col, infected_lt), delete_S_ind
+
+
+def R0_finder(R0:float, rho: float, dispersqal_param: float, dispersal_norm: float, inf_t: int) -> float:
+    """
+    Stupid method to estimate beta_factor from epidemic input params.
+    Equation is based on eq 5.14 from the thesis
+    :param R0: reproduction ratio
+    :param rho: density @ t=0
+    :param dispersal_param: length-scale
+    :param inf_t: infected lifetime
+
+    return: beta_factor
+    """
+
+    def E1_integrad(x: float):
+        return (1/x) * np.exp(-x)
+
+    eulers_constant = 0.57721
+    
+    for beta_factor in np.linspace(0.0100, 100, 1000):
+        beta_pr = beta_factor * dispersal_norm
+        E1 = quad(E1_integrad, beta_pr * inf_t, np.inf)[0]
+        ln = np.log(beta_pr * inf_t)
+        R0_est = np.pi * rho * dispersqal_param**2 * (E1 + ln + eulers_constant)
+        if (R0 - R0/20) < R0_est and (R0 + R0/20) > R0_est:
+            print(f'R0 est = {R0_est}')  
+            return beta_factor
+
+    raise Exception('Did not fine suitable value of beta-factor')
 

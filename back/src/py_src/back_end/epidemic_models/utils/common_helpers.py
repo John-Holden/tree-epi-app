@@ -163,7 +163,7 @@ def write_SIR_fields(sim_save_loc: str, S: List[np.ndarray], I: List[np.ndarray]
 def get_env_var(var: str):
     if os.environ.get(var) is None:
         logger(f'[e] Environment variable {var} not defined!')
-        raise Exception(NameError)
+        return None
     
     return os.environ.get(var)
         

@@ -1,37 +1,58 @@
+from cmath import log
 import ctypes
 import datetime as dt
 from py_src.back_end.epidemic_models.compartments import SIR
-from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR
+from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR, R0_finder
 from py_src.back_end.epidemic_models.utils.common_helpers import (get_tree_density, get_model_name, logger, write_simulation_params,
-                                                                  write_SIR_fields)
+                                                                  write_SIR_fields, get_env_var)
 
 from py_src.params_and_config import (PATH_TO_CPP_EXECUTABLE, GenericSimulationConfig, RuntimeSettings, SaveOptions, 
                                       set_dispersal, set_domain_config, set_runtime, set_infectious_lt, set_initial_conditions, 
-                                      set_infection_dynamics, set_R0_trace)
+                                      set_infection_dynamics, set_R0_trace, set_epidemic_parameters)
     
 
 
 def get_simulation_config(sim_params: dict) -> GenericSimulationConfig:
     """Validate and return the simulation configuaration """
 
+    # Set domain & host number
     host_number = int(sim_params['host_number'])
     domain_size = tuple(map(int, sim_params['domain_size']))
-    dispersal = set_dispersal(sim_params['dispersal_type'], sim_params['dispersal_param'])
     
     domain = set_domain_config(domain_type='simple_square',
                                scale_constant=1,
                                patch_size=domain_size,
                                tree_density=get_tree_density(host_number, domain_size))
 
+    # Set dispersal
+    dispersal_type, dispersal_param = sim_params['dispersal_type'], sim_params['dispersal_param']
+    dispersal_param = int(dispersal_param) if dispersal_type == 'gaussian' \
+                                                          else tuple(map(float, dispersal_param))                            
+    
+    dispersal = set_dispersal(dispersal_type, dispersal_param)
+
+    # Set runtime & infection dynamics
     runtime = set_runtime(int(sim_params['simulation_runtime']))
     infectious_lt = set_infectious_lt('exp', int(sim_params['infectious_lifetime']))
 
-    infection_dynamics = set_infection_dynamics('SIR',
-                                                int(sim_params['secondary_R0']),
-                                                pr_approx=False)
+    R0 = float(sim_params['secondary_R0'])
+    beta_factor = R0_finder(R0, domain.tree_density, dispersal.value, 
+                            dispersal.norm_factor, infectious_lt.steps)
+
+    logger(f'R0 is {R0}')
+    logger(f'beta factor is {beta_factor}')
+
+    infection_dynamics = set_infection_dynamics('SIR', beta_factor, pr_approx=False)
 
     initial_conditions = set_initial_conditions(sim_params['initially_infected_dist'],
                                                 int(sim_params['initially_infected_hosts']))
+    
+    if get_env_var('FLASK_ENV') == 'development':
+        logger(f'[i] host number: {host_number}')
+        logger(f'[i] Domain size: {domain_size}')
+        logger(f'[i] Dispersal: {dispersal}')
+        logger(f'[i] Infectin dynamics: {infection_dynamics}')
+        logger(f'[i] Inital conditions: {initial_conditions}')
 
     return GenericSimulationConfig({'runtime': runtime,
                                     'dispersal': dispersal,
@@ -77,9 +98,15 @@ def generic_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions,
     except Exception as e:
         logger(f'Failed pre-sim checks')
         raise e
+    
+    
+    epidemic_parameters = set_epidemic_parameters(sim_context.domain_config.tree_density,
+                                                  sim_context.infection_dynamics.beta_factor,
+                                                  sim_context.dispersal,
+                                                  sim_context.sporulation)
 
     start = dt.datetime.now()
-    sim_result = SIR.run_SIR(sim_context, save_options, runtime_settings)
+    sim_result = SIR.run_SIR(sim_context, save_options, runtime_settings, epidemic_parameters)
     elapsed = dt.datetime.now() - start
     logger(f"[i] Termination condition: {sim_result['termination']}...\n"
            f"[i] Sim steps elapsed: {sim_result['end']}...\n"

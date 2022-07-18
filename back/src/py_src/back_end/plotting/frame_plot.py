@@ -89,7 +89,10 @@ def SIR_frame(S: List[np.ndarray], I: List[np.ndarray], R: List[np.ndarray], t: 
     if save_frame:
         frame_name = f'img_{frame_label(t)}.{ext}' 
         dest = f"{get_env_var('FRAME_SAVE_DEST')}/{frame_name}"
-        logger(f'[i] Frame plot saving to {dest} @ step {t}')
+
+        if get_env_var('FLASK_ENV') == 'development':
+            logger(f'[i] Frame plot saving to {dest} @ step {t}')
+            
         plt.savefig(dest)
 
     if show_frame:

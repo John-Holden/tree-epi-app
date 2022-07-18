@@ -7,7 +7,7 @@ from py_src.back_end.epidemic_models.utils.common_helpers import logger
 from py_src.back_end.epidemic_models.exceptions import IncorrectHostNumber
 from py_src.back_end.epidemic_models.utils.common_helpers import get_total_host_number
 from py_src.back_end.epidemic_models.utils.dynamics_helpers import (set_SIR, set_R0_trace_struct, new_infections)
-from py_src.params_and_config import (GenericSimulationConfig, SaveOptions, RuntimeSettings, set_epidemic_parameters,
+from py_src.params_and_config import (Epidemic_parameters, GenericSimulationConfig, SaveOptions, RuntimeSettings, set_epidemic_parameters,
                                       LAMBDA_TIMEOUT)
 
 
@@ -47,7 +47,8 @@ def evolve_time_step(S_t1, I_t1, R_t1, t, epidemic_parameters, domain_config, di
     return [S_t2_row, S_t2_col], [I_t2_row, I_t2_col, I_t2_lt], [R_t2_row, R_t2_col]
 
 
-def run_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, rt_settings: RuntimeSettings):
+def run_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, rt_settings: RuntimeSettings,
+            epidemic_parameters: Epidemic_parameters):
     """
     Simulate ash dieback over
     """
@@ -59,11 +60,6 @@ def run_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, rt_
     S, I, R = set_SIR(sim_context.domain_config,
                       sim_context.initial_conditions,
                       sim_context.infectious_lt)
-
-    epidemic_parameters = set_epidemic_parameters(sim_context.domain_config.tree_density,
-                                                  sim_context.infection_dynamics.beta_factor,
-                                                  sim_context.dispersal,
-                                                  sim_context.sporulation)
 
     break_condition = None
     max_d_ts = np.zeros(sim_context.runtime.steps) if save_options.save_max_d else None

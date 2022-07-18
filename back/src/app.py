@@ -34,7 +34,11 @@ def ffmegp_anim():
     animate_cmd = f'{anim_path}/animate.sh {frame_path} {anim_path}'
     process = subprocess.Popen(animate_cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
-    logger(output), logger(error)
+
+    if get_env_var('FLASK_ENV') == 'development':
+        logger(output), 
+    
+    logger(error)
 
 
 @app.route("/", methods=['POST'])
