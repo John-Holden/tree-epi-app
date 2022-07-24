@@ -8,7 +8,7 @@ from flask_cors import CORS
 from flask import Flask, jsonify, make_response, request
 from matplotlib.ft2font import LOAD_TARGET_LIGHT
 from py_src.back_end.epidemic_models.utils.common_helpers import logger, get_env_var
-from py_src.back_end.epidemic_models.executor import execute_cpp_SIR, get_simulation_config, generic_SIR
+from py_src.back_end.epidemic_models.executor import execute_cpp_SIR, get_simulation_config, generic_SIR, get_updates
 from py_src.params_and_config import (mkdir_tmp_store, GenericSimulationConfig, SaveOptions, RuntimeSettings)
 
 
@@ -65,6 +65,26 @@ def simulation_request_handler():
     except Exception as e:
         logger(f'[e] Simulation failed: {e}')
         return make_response(jsonify(error=f'{e}'), 500)
+
+
+
+@app.route("/stateupdate", methods=['POST'])
+def get_R0():
+    """
+        Calcuate R0 based on input input parameters
+    """
+    start = dt.datetime.now()
+    R0_estimated, density, beta_max = get_updates(request.get_json(force=True))
+    elapsed = dt.datetime.now() - start
+    logger(f'[i] Got R0 IN {elapsed} (s)...')
+    try:
+        return make_response(jsonify(R0=R0_estimated,
+                                     density=density,
+                                     beta_max=beta_max), 200)
+    except Exception as e:
+        logger(f'[e] R0 calculation failed: {e}')
+        return make_response(jsonify(error=f'{e}'), 500)
+
 
 @app.errorhandler(404)
 def resource_not_found():

@@ -1,6 +1,7 @@
-from cmath import log
 import ctypes
 import datetime as dt
+import imp
+import numpy as np
 from py_src.back_end.epidemic_models.compartments import SIR
 from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR, R0_finder
 from py_src.back_end.epidemic_models.utils.common_helpers import (get_tree_density, get_model_name, logger, write_simulation_params,
@@ -12,8 +13,50 @@ from py_src.params_and_config import (PATH_TO_CPP_EXECUTABLE, GenericSimulationC
     
 
 
+
+def find_beta_max(density, dispersal_value, dispersal_norm_factor, inf_lt) -> float:
+    """
+        Calculate an upper bound for R0 based on input epidemic parameters
+    """
+
+    # TODO write smart function to increase limits
+    for beta_factor in np.arange(1, 10000, 2):
+        R0_est = R0_finder(beta_factor, density, dispersal_value, dispersal_norm_factor, inf_lt)
+        if R0_est > 10:
+            print(f'Beta factor {beta_factor} | R0 est {R0_est}')
+            return beta_factor
+
+    raise Exception('Did not find max beta value')
+    
+
+
+
+def get_updates(epi_params: dict) -> float:
+    """
+        Calculate an estimate for R0 based on input epidemic parameters
+    """
+    host_number = int(epi_params['host_number'])
+    domain_size = tuple(map(int, epi_params['domain_size']))
+    density = get_tree_density(host_number, domain_size)
+    beta_factor = int(epi_params['infectivity'])
+    inf_lt = int(epi_params['infectious_lifetime'])
+    sim_rt = int(epi_params['simulation_runtime'])
+    
+    dispersal_type, dispersal_param = epi_params['dispersal_type'], epi_params['dispersal_param']
+    dispersal_param = int(dispersal_param) if dispersal_type == 'gaussian' \
+                                                           else tuple(map(float, dispersal_param))
+
+    dispersal = set_dispersal(dispersal_type, dispersal_param)
+    R0_est = R0_finder(beta_factor, density, dispersal.value, dispersal.norm_factor, inf_lt)
+    beta_max = find_beta_max(density, dispersal.value, dispersal.norm_factor, inf_lt)
+
+    return round(R0_est, 2), round(density, 3), round(beta_max)
+
+
 def get_simulation_config(sim_params: dict) -> GenericSimulationConfig:
-    """Validate and return the simulation configuaration """
+    """
+        Validate and return the simulation configuaration 
+    """
 
     # Set domain & host number
     host_number = int(sim_params['host_number'])
@@ -27,23 +70,13 @@ def get_simulation_config(sim_params: dict) -> GenericSimulationConfig:
     # Set dispersal
     dispersal_type, dispersal_param = sim_params['dispersal_type'], sim_params['dispersal_param']
     dispersal_param = int(dispersal_param) if dispersal_type == 'gaussian' \
-                                                          else tuple(map(float, dispersal_param))                            
-    
+                                                          else tuple(map(float, dispersal_param))
     dispersal = set_dispersal(dispersal_type, dispersal_param)
-
     # Set runtime & infection dynamics
     runtime = set_runtime(int(sim_params['simulation_runtime']))
     infectious_lt = set_infectious_lt('exp', int(sim_params['infectious_lifetime']))
-
-    R0 = float(sim_params['secondary_R0'])
-    beta_factor = R0_finder(R0, domain.tree_density, dispersal.value, 
-                            dispersal.norm_factor, infectious_lt.steps)
-
-    logger(f'R0 is {R0}')
-    logger(f'beta factor is {beta_factor}')
-
+    beta_factor = float(sim_params['infectivity'])
     infection_dynamics = set_infection_dynamics('SIR', beta_factor, pr_approx=False)
-
     initial_conditions = set_initial_conditions(sim_params['initially_infected_dist'],
                                                 int(sim_params['initially_infected_hosts']))
     
