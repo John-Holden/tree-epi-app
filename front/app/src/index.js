@@ -8,10 +8,10 @@ import reportWebVitals from './reportWebVitals';
 ReactDOM.render(
   <React.StrictMode>
     
-    <div className="App"> 
+    <div className="App">
     <header className="App-header">
       
-      <SimulationPanel />
+      {/* <SimulationPanel /> */}
       <InputParameters />
 
     </header>

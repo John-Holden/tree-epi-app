@@ -28,10 +28,15 @@ def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_
     generic_SIR(sim_config, save_options, rt_settings)
 
 
-def ffmegp_anim():
+def ffmegp_anim() -> str:
+    """
+        Execute a shell command to produce an mp4, then return the simulation location.
+    """
     anim_path = get_env_var('ANIM_SAVE_DEST')
     frame_path = get_env_var('FRAME_SAVE_DEST')
-    animate_cmd = f'{anim_path}/animate.sh {frame_path} {anim_path}'
+    dtnow = dt.datetime.now().strftime('%Y%m%d%s')
+    print(dtnow)
+    animate_cmd = f'{anim_path}/animate.sh {frame_path} {anim_path} {dtnow}'
     process = subprocess.Popen(animate_cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
 
@@ -39,6 +44,8 @@ def ffmegp_anim():
         logger(output), 
     
     logger(error)
+    
+    return dtnow
 
 
 @app.route("/", methods=['POST'])
@@ -60,8 +67,8 @@ def simulation_request_handler():
     try:
         simulate(sim_config, save_options, rt_settings)
         logger('[i] Finished succesful simulation')
-        ffmegp_anim()
-        return make_response(jsonify(message=f'The backend is alive! This is what you gave me mofo {sim_config} '), 200)
+        sim_location = ffmegp_anim()
+        return make_response(jsonify(video_ref=sim_location), 200)
     except Exception as e:
         logger(f'[e] Simulation failed: {e}')
         return make_response(jsonify(error=f'{e}'), 500)

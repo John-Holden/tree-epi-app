@@ -4440,8 +4440,8 @@ fs.realpath@^1.0.0:
 
 fs@^0.0.1-security:
   version "0.0.1-security"
-  resolved "https://registry.npmjs.org/fs/-/fs-0.0.1-security.tgz"
-  integrity sha1-invTcYa23d84E/I4WLV+yq9eQdQ=
+  resolved "https://registry.yarnpkg.com/fs/-/fs-0.0.1-security.tgz#8a7bd37186b6dddf3813f23858b57ecaaf5e41d4"
+  integrity sha512-3XY9e1pP0CVEUCdj5BmfIZxRBTSDycnbqhIOGec9QYtmVH2fbLpj86CFWkrNOkt/Fvty4KZG5lTglL9j/gJ87w==
 
 fsevents@^2.3.2, fsevents@~2.3.2:
   version "2.3.2"
@@ -5785,6 +5785,13 @@ lines-and-columns@^1.1.6:
   version "1.2.4"
   resolved "https://registry.npmjs.org/lines-and-columns/-/lines-and-columns-1.2.4.tgz"
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
+
+list-react-files@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/list-react-files/-/list-react-files-0.2.0.tgz#5d5102d42270328e085dfee6b90338bbc4cbe234"
+  integrity sha512-ZbBO+Ch76klfcD+bf/0FCBzCMZ16moT598cUo5yn0PbdQzQp4C11hZiHXAUnm3OZUXfV/ze1mog6wzwH4AGdKQ==
+  dependencies:
+    glob "^7.1.2"
 
 load-script@^1.0.0:
   version "1.0.0"

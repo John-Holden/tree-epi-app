@@ -26,11 +26,10 @@ code {
 
 .simulationPanel{
   position: fixed;
-  width: 1000px;
-  height: 1000px;
-  left: 0%;
-  top: 10%;
-  margin-left: 150px}
+  width: 1200px;
+  height: 1200px;
+  left: 20%;
+  top: 10%;}
 
 .inputParamPanel{
   position: fixed;
@@ -42,8 +41,6 @@ code {
   /* margin-left: 0px; */
   margin-left: 10px; 
   text-align: left;
-  
-
 }
 
 .inputForm{
@@ -62,7 +59,6 @@ code {
   text-align: right;
 }
 
-
 .smaller-input {
   font-size: 12px;
   padding: 2px 5px;
@@ -74,4 +70,19 @@ code {
 
 .p3 {
   padding-bottom: 3cm;
+}
+
+.inputBox {
+  background-color : whitesmoke;
+  color : black;
+  width: 38px;
+  border-style:solid;
+  text-align: center;
+}
+
+.inputBoxBig {
+  background-color : whitesmoke;
+  color : black;
+  width: 100px;
+  border-style:solid;
 }
