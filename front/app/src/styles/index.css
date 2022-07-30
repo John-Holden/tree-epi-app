@@ -12,7 +12,6 @@ code {
     monospace;
 }
 
-
 .container {
   width: 1000px;
   height: 1000px;
@@ -31,7 +30,7 @@ code {
   height: 1000px;
   left: 0%;
   top: 10%;
-  margin-left: 100px}
+  margin-left: 150px}
 
 .inputParamPanel{
   position: fixed;
@@ -40,7 +39,11 @@ code {
   height: 1000px;
   left: 0%;
   top: 10%;
-  margin-left: 0px;
+  /* margin-left: 0px; */
+  margin-left: 10px; 
+  text-align: left;
+  
+
 }
 
 .inputForm{
