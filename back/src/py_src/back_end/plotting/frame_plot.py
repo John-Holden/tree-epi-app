@@ -68,7 +68,7 @@ def SIR_frame(S: List[np.ndarray], I: List[np.ndarray], R: List[np.ndarray], t: 
     """
     rho = sim_context.domain_config.tree_density
     alpha = sim_context.domain_config.scale_constant
-    _, ax = plt.subplots(figsize=(7, 7))
+    _, ax = plt.subplots()
 
     plt.title(rf"T : {t} | $\rho$ = {rho}, $\alpha$ = {alpha}$m^2$")
     ax.scatter(S[1], S[0], s=Spx, c='green', label=r'$S$', alpha=0.30)
@@ -77,14 +77,12 @@ def SIR_frame(S: List[np.ndarray], I: List[np.ndarray], R: List[np.ndarray], t: 
     ax.scatter(R[1], R[0], s=Rpx, c='black', label=r'$R$')
     ax.scatter(R[1], R[0], s=200, c='black', alpha=0.10)
 
-    locs = plt.xticks()[0]
-    labels = [int(i*alpha) for i in locs if i not in [locs[0], locs[-1]]]
-    locs = [i for i in locs if i not in [locs[0], locs[-1]]]
-
-    plt.xticks(locs, labels)
-    plt.xlabel('L')
-    plt.yticks(locs, labels)
-    plt.ylabel('L')
+    # locs = plt.xticks()[0]
+    # labels = [int(i*alpha) for i in locs if i not in [locs[0], locs[-1]]]
+    # locs = [i for i in locs if i not in [locs[0], locs[-1]]]
+    
+    plt.axis('off')
+    plt.tight_layout()
 
     if save_frame:
         frame_name = f'img_{frame_label(t)}.{ext}' 

@@ -1,6 +1,9 @@
 import ctypes
 import datetime as dt
 import imp
+from operator import le
+from traceback import print_tb
+from xml import dom
 import numpy as np
 from py_src.back_end.epidemic_models.compartments import SIR
 from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR, R0_finder
@@ -20,7 +23,7 @@ def find_beta_max(density, dispersal_value, dispersal_norm_factor, inf_lt) -> fl
     """
 
     # TODO write smart function to increase limits
-    for beta_factor in np.arange(1, 10000, 2):
+    for beta_factor in np.arange(1, 100000, 2):
         R0_est = R0_finder(beta_factor, density, dispersal_value, dispersal_norm_factor, inf_lt)
         if R0_est > 10:
             print(f'Beta factor {beta_factor} | R0 est {R0_est}')
@@ -37,14 +40,31 @@ def get_updates(epi_params: dict) -> float:
     """
     host_number = int(epi_params['host_number'])
     domain_size = tuple(map(int, epi_params['domain_size']))
+
+    if not domain_size[0] * domain_size[1]:
+        return
+
     density = get_tree_density(host_number, domain_size)
     beta_factor = int(epi_params['infectivity'])
+    
+    if not beta_factor:
+        return
+
     inf_lt = int(epi_params['infectious_lifetime'])
+
+    if not inf_lt:
+        return
+        
     sim_rt = int(epi_params['simulation_runtime'])
+
+
     
     dispersal_type, dispersal_param = epi_params['dispersal_type'], epi_params['dispersal_param']
     dispersal_param = int(dispersal_param) if dispersal_type == 'gaussian' \
                                                            else tuple(map(float, dispersal_param))
+
+    if type(dispersal_param) == int and not dispersal_param:
+        return
 
     dispersal = set_dispersal(dispersal_type, dispersal_param)
     R0_est = R0_finder(beta_factor, density, dispersal.value, dispersal.norm_factor, inf_lt)

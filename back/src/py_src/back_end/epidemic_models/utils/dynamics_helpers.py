@@ -69,8 +69,9 @@ def set_I(init_cond: Initial_conditions, patch_size: tuple, infect_lt: I_lt) -> 
         elif init_cond.distribution == 'centralised':
             # Populate a small square of infected trees in the center of the domain
             xarr, yarr = np.meshgrid(np.arange(0, Ly, 1), np.arange(0, Lx, 1))
-            dist_arr = np.sqrt((xarr - Lx / 2) ** 2 + (yarr - Ly / 2) ** 2)
+            dist_arr = np.sqrt((yarr - Lx / 2) ** 2 + (xarr - Ly / 2) ** 2)
             domain_center = np.where(dist_arr < np.sqrt(init_n_infected) + 20)
+
             rand = np.random.permutation(np.arange(0, len(domain_center[0]), 1))
             I_row = [i for i in domain_center[0][rand[:init_n_infected]]]
             I_col = [i for i in domain_center[1][rand[:init_n_infected]]]

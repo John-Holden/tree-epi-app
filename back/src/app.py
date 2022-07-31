@@ -81,13 +81,19 @@ def get_R0():
         Calcuate R0 based on input input parameters
     """
     start = dt.datetime.now()
-    R0_estimated, density, beta_max = get_updates(request.get_json(force=True))
+    out = get_updates(request.get_json(force=True))
+    if out is None:
+        R0_estimated, density, beta_max = '', '', ''
+
+    else:
+        R0_estimated, density, beta_max = out
+
     elapsed = dt.datetime.now() - start
     logger(f'[i] Got R0 IN {elapsed} (s)...')
     try:
         return make_response(jsonify(R0=R0_estimated,
-                                     density=density,
-                                     beta_max=beta_max), 200)
+                                        density=density,
+                                        beta_max=beta_max), 200)
     except Exception as e:
         logger(f'[e] R0 calculation failed: {e}')
         return make_response(jsonify(error=f'{e}'), 500)
