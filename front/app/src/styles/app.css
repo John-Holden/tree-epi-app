@@ -17,11 +17,12 @@
   background-color: rgb(112, 123, 143);
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction:row;
+  align-items: flex-start;
   justify-content: center;
   font-size: calc(12px + 2vmin);
   color: white;
+  text-align: center;
 }
 
 .App-link {

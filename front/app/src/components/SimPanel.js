@@ -1,12 +1,11 @@
 import '../styles/app.css'
-import React from 'react';
+import React, {useEffect, useRef, useState, forwardRef} from 'react';
 
-function SimulationPanel(videoRefData) {
+function SimulationPanel( props ) {
 
-  let videoRef = videoRefData.parentToChild
+  let videoRef = props['videoRefData']
   videoRef = `./media/${videoRef}.mp4`
-  const catImagePath = 'https://tree-epi-site-bucket.s3.etu-west-2.amazonaws.com/Thinking-of-getting-a-cat.png'
-
+   
   const isSimGenerated = () => {
     try {
      require(`${videoRef}`)
@@ -21,21 +20,16 @@ function SimulationPanel(videoRefData) {
   
   if  ( mySim == false) {
     //  Sim not generate, rendering cat
-    return (
-        <div className='simulationPanel'> 
-            <p> Image not here</p> 
-            <img src={catImagePath} />
-          </div>
-    );
+    videoRef = './media/sim-out.mp4'
   }
   
-  else {
-    const simulation = require(`${videoRef}`)
-    return (
-        <div className='simulationPanel'> 
-            <video src={simulation} type="video/mp4" controls> </video> 
-        </div>
-    );
-}}
+
+  const simulation = require(`${videoRef}`)
+  return (
+      <div className='simulationPanel'> 
+          <video src={simulation} type="video/mp4" controls> </video> 
+      </div>
+  );
+}
 
 export default SimulationPanel;

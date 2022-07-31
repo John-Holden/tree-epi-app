@@ -1,6 +1,6 @@
 import '../styles/app.css';
 import 'katex/dist/katex.min.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { InlineMath } from 'react-katex';
 import SimulationPanel from './SimPanel';
 
@@ -9,31 +9,32 @@ const labelSize = {
 }
 
 function InputParameters() {
-  // Initialise simulation parameter
-  const ApiHostName = process.env.REACT_APP_API_URL;
-  const [videoRefData, setVideoRefData] = useState("sim-out")
-  const [dispersaType, setDispersal] = useState("gaussian");
-  const [dispersalScale, setDispersalScale] = useState(100);
-  const [domainX, setDomainX] = useState(500);
-  const [domainY, setDomainY] = useState(500);
-  const [hostNumber, setHostNumber] = useState(1000);
-  const [infectivity, setInfectivity] = useState(25)
-  const [density, setDensity] = useState(0.01)
-  const [infectivityUpperLim, setinfectivityUpperLim] = useState('25')
-  const [infectiousLT, setInfectiousLT] = useState(10);
-  const [simulationRT, setSimulationRT] = useState(100);
-  const [initiallyInfected, setInitiallyInfected] = useState(20);
-  const [initiallyInfectedDist, setInitiallyInfectedDist] = useState("centralised");
-  const [secondaryR0, setSecondaryR0] = useState(0);
-  const susceptibleHosts = 'S';
-  const infectedHosts = 'I';
-  const secondaryR0Label = 'R\_{0}';
-  const infectivityBeta = '\\beta';
-  const densityRho = '\\rho';
-
- let updateEpiState = async () => {
+ // Initialise simulation parameter
+ const ApiHostName = process.env.REACT_APP_API_URL;
+ const [videoRefData, setVideoRefData] = useState("sim-out")
+ const [dispersaType, setDispersal] = useState("gaussian");
+ const [dispersalScale, setDispersalScale] = useState(100);
+ const [domainX, setDomainX] = useState(500);
+ const [domainY, setDomainY] = useState(500);
+ const [hostNumber, setHostNumber] = useState(1000);
+ const [infectivity, setInfectivity] = useState(25)
+ const [density, setDensity] = useState(0.01)
+ const [infectivityUpperLim, setinfectivityUpperLim] = useState('25')
+ const [infectiousLT, setInfectiousLT] = useState(10);
+ const [simulationRT, setSimulationRT] = useState(100);
+ const [initiallyInfected, setInitiallyInfected] = useState(20);
+ const [initiallyInfectedDist, setInitiallyInfectedDist] = useState("centralised");
+ const [secondaryR0, setSecondaryR0] = useState(0);
+ const susceptibleHosts = 'S';
+ const infectedHosts = 'I';
+ const secondaryR0Label = 'R\_{0}';
+ const infectivityBeta = '\\beta';
+ const densityRho = '\\rho';
+  
   // Update R0 value, conditional on density, infectivity, & infectious lifetime 
+ let updateEpiState = async () => {
   try {
+    // Get R0 value and denstiy from backend response
     let res = await fetch(`${ApiHostName}/stateupdate`, 
     { 
       method: "POST",
@@ -46,6 +47,7 @@ function InputParameters() {
                             "simulation_runtime": simulationRT})
     });
     
+    // Update values
     function updateR0andDensity(jsonData) {
       setDensity(jsonData['density'])
       setSecondaryR0(jsonData['R0'])
@@ -63,7 +65,7 @@ function InputParameters() {
   }
  }
  
-  // Submit a simulation to the backend
+  // Submit a simulation request to the backend
  let handleSubmitResp = async (e) => {
     e.preventDefault();
     try {
@@ -154,10 +156,11 @@ function InputParameters() {
           <input className='inputBoxBig' type="submit" value="Simulate"/>
         </form>
         <div className='simulationPanel'>
-          <SimulationPanel className='simulationPanel' parentToChild={videoRefData}/>
+          <SimulationPanel className='simulationPanel' videoRefData={videoRefData}/>
         </div>
       </div>
   );
 }
+
 
 export default InputParameters;
