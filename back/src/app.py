@@ -1,6 +1,7 @@
 """
 Simple flask app to handle incoming simulationrequests
 """
+from operator import le
 import os
 import subprocess
 import datetime as dt
@@ -18,14 +19,14 @@ port = int(os.environ.get('PORT', 5000))
 app.run(debug=True, host='0.0.0.0', port=port)
 
 
-def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_settings: RuntimeSettings):
+def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_settings: RuntimeSettings) -> dict:
     """
-        Simulate the spread of disease
+        Simulate the spread of disease & return output SIR fields
     """
     mkdir_tmp_store(get_env_var('FRAME_SAVE_DEST'))
     ## TODO execute compiled c++ version of the algorithm
     # execute_cpp_SIR(sim_config, save_options, rt_settings)
-    generic_SIR(sim_config, save_options, rt_settings)
+    return generic_SIR(sim_config, save_options, rt_settings)
 
 
 def ffmegp_anim() -> str:
@@ -35,7 +36,6 @@ def ffmegp_anim() -> str:
     anim_path = get_env_var('ANIM_SAVE_DEST')
     frame_path = get_env_var('FRAME_SAVE_DEST')
     dtnow = dt.datetime.now().strftime('%Y%m%d%s')
-    print(dtnow)
     animate_cmd = f'{anim_path}/animate.sh {frame_path} {anim_path} {dtnow}'
     process = subprocess.Popen(animate_cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
@@ -62,13 +62,18 @@ def simulation_request_handler():
     rt_settings.frame_freq = 1
     save_options = SaveOptions()
     save_options.frame_save = True
+    save_options.save_field_time_series = True
     elapsed = dt.datetime.now() - start
     logger(f'[i] Configured & validated params in {elapsed } (s)...')
     try:
-        simulate(sim_config, save_options, rt_settings)
+        SIR_fields = simulate(sim_config, save_options, rt_settings)
         logger('[i] Finished succesful simulation')
         sim_location = ffmegp_anim()
-        return make_response(jsonify(video_ref=sim_location), 200)
+        return make_response(jsonify(video_ref=sim_location, 
+                                     S=SIR_fields['S'], 
+                                     I=SIR_fields['I'], 
+                                     R=SIR_fields['R'],
+                                     t=[i for i in range(len(SIR_fields['S']))]), 200)
     except Exception as e:
         logger(f'[e] Simulation failed: {e}')
         return make_response(jsonify(error=f'{e}'), 500)
@@ -84,7 +89,6 @@ def get_R0():
     out = get_updates(request.get_json(force=True))
     if out is None:
         R0_estimated, density, beta_max = '', '', ''
-
     else:
         R0_estimated, density, beta_max = out
 

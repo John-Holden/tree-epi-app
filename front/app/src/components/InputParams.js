@@ -1,7 +1,9 @@
 import '../styles/app.css';
 import 'katex/dist/katex.min.css';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InlineMath } from 'react-katex';
+import {Circles} from "react-loader-spinner";
+import Plot from 'react-plotly.js';
 import SimulationPanel from './SimPanel';
 
 const labelSize = {
@@ -30,7 +32,13 @@ function InputParameters() {
  const secondaryR0Label = 'R\_{0}';
  const infectivityBeta = '\\beta';
  const densityRho = '\\rho';
-  
+ const [spinner, setSpinner] = useState(false);  
+ const [S_field, setS_field] = useState([1, 2, 3])
+ const [I_field, setI_field] = useState([1, 2, 3])
+ const [R_field, setR_field] = useState([4, 5, 6])
+ const [t_field, setT_field] = useState([1, 3, 5])
+
+
   // Update R0 value, conditional on density, infectivity, & infectious lifetime 
  let updateEpiState = async () => {
   try {
@@ -64,9 +72,11 @@ function InputParameters() {
     alert(`Failed. Error ${err}`)
   }
  }
- 
+
   // Submit a simulation request to the backend
  let handleSubmitResp = async (e) => {
+    
+    setSpinner(true)
     e.preventDefault();
     try {
       let res = await fetch(ApiHostName, 
@@ -82,7 +92,16 @@ function InputParameters() {
                               "initially_infected_hosts": initiallyInfected,
                               "initially_infected_dist": initiallyInfectedDist})
       });
-      res.json().then((data) => {setVideoRefData(data['video_ref'])})
+
+      function updateOutState(jsonData) {
+        setVideoRefData(jsonData['video_ref'])
+        setS_field(jsonData['S'])
+        setI_field(jsonData['I'])
+        setR_field(jsonData['R'])
+        setT_field(jsonData['t'])
+      }
+
+      res.json().then(data => {updateOutState(data)})
       if (res.status === 200) {
       } 
       else {
@@ -93,6 +112,7 @@ function InputParameters() {
       console.log(err);
       alert(`Simulation Failed: ${err}`)
     }
+    setSpinner(false)
   };
 
   useEffect(() => {
@@ -155,8 +175,75 @@ function InputParameters() {
           <p></p>
           <input className='inputBoxBig' type="submit" value="Simulate"/>
         </form>
+          {spinner &&  <Circles width="100" height="100" className='spinner'/>}
         <div className='simulationPanel'>
           <SimulationPanel className='simulationPanel' videoRefData={videoRefData}/>
+        </div>
+        <div className='plots'>
+        <Plot
+            data={[
+              {
+                x: t_field,
+                y: S_field,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {color: 'green'},
+                name: 'S',
+                automargin: true,
+              },
+              {
+                x: t_field,
+                y: I_field,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {color: 'red'},
+                name: 'I',
+                automargin: true,
+              },
+              {
+                x: t_field,
+                y: R_field,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {color: 'black'},
+                name: 'R',
+                automargin: true,
+              },
+            ]}
+            layout={ {width: 600, height: 400, title: 'SIR fields'} }
+          />
+          <Plot
+            data={[
+              {
+                x: t_field,
+                y: S_field,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {color: 'green'},
+                name: 'S',
+                automargin: true,
+              },
+              {
+                x: t_field,
+                y: I_field,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {color: 'red'},
+                name: 'I',
+                automargin: true,
+              },
+              {
+                x: t_field,
+                y: R_field,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: {color: 'black'},
+                name: 'R',
+                automargin: true,
+              },
+            ]}
+            layout={ {width: 600, height: 400, title: 'SIR fields'} }
+          />
         </div>
       </div>
   );

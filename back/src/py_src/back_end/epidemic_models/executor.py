@@ -22,12 +22,11 @@ def find_beta_max(density, dispersal_value, dispersal_norm_factor, inf_lt) -> fl
         Calculate an upper bound for R0 based on input epidemic parameters
     """
 
-    # TODO write smart function to increase limits
-    for beta_factor in np.arange(1, 100000, 2):
-        R0_est = R0_finder(beta_factor, density, dispersal_value, dispersal_norm_factor, inf_lt)
-        if R0_est > 10:
-            print(f'Beta factor {beta_factor} | R0 est {R0_est}')
-            return beta_factor
+    for beta_factor_max in np.arange(1, 100000, 2):
+        R0_est = R0_finder(beta_factor_max, density, dispersal_value, dispersal_norm_factor, inf_lt)
+        if R0_est > 20:
+            print(f'Beta factor {beta_factor_max} | R0 est {R0_est}')
+            return beta_factor_max
 
     raise Exception('Did not find max beta value')
     
@@ -40,6 +39,9 @@ def get_updates(epi_params: dict) -> float:
     """
     host_number = int(epi_params['host_number'])
     domain_size = tuple(map(int, epi_params['domain_size']))
+
+    if not host_number:
+        return
 
     if not domain_size[0] * domain_size[1]:
         return
@@ -54,11 +56,7 @@ def get_updates(epi_params: dict) -> float:
 
     if not inf_lt:
         return
-        
-    sim_rt = int(epi_params['simulation_runtime'])
-
-
-    
+            
     dispersal_type, dispersal_param = epi_params['dispersal_type'], epi_params['dispersal_param']
     dispersal_param = int(dispersal_param) if dispersal_type == 'gaussian' \
                                                            else tuple(map(float, dispersal_param))
@@ -137,7 +135,7 @@ def pre_sim_checks(sim_context: GenericSimulationConfig, save_options: SaveOptio
         raise Exception('Enable max distance metric to use the percolation BCD')
 
 
-def generic_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, runtime_settings: RuntimeSettings):
+def generic_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, runtime_settings: RuntimeSettings) -> dict:
     """
     Run a single SIR/SEIR model simulation
     :param save_options:
@@ -164,8 +162,8 @@ def generic_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions,
     logger(f"[i] Termination condition: {sim_result['termination']}...\n"
            f"[i] Sim steps elapsed: {sim_result['end']}...\n"
            f"[i] Sim time elapsed: {elapsed} (s)...")
-    # todo
-    #   end_of_sim_plots(sim_context, sim_result, runtime_settings)
+    
+    return sim_result['SIR_fields']
 
 
 def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, runtime_settings: RuntimeSettings):

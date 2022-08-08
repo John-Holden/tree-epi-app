@@ -1,3 +1,4 @@
+from operator import le
 import os
 import time
 import numpy as np
@@ -66,12 +67,14 @@ def run_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, rt_
     st_frames = {} if save_options.save_st_fields and rt_settings.frame_plot and rt_settings.frame_freq else None
     host_number = get_total_host_number(S, I, R, sim_context.domain_config)
     host_number_at_t = None
-    S_ts = np.ones(sim_context.runtime.steps) * host_number if save_options.save_field_time_series else None
-    I_ts = np.zeros_like(S_ts) if save_options.save_field_time_series else None
-    R_ts = np.zeros_like(S_ts) if save_options.save_field_time_series else None
-
+    S_ts = [host_number] * sim_context.runtime.steps if save_options.save_field_time_series else None
+    I_ts = [sim_context.initial_conditions.initially_infected] * sim_context.runtime.steps if save_options.save_field_time_series else None
+    R_ts = [0] * sim_context.runtime.steps if save_options.save_field_time_series else None
+    
     R0_struct = set_R0_trace_struct(sim_context.R0_trace, sim_context.infection_dynamics, I) \
         if sim_context.R0_trace.active else None
+
+    print(R0_struct)
 
     if 'HPC_MODE' not in os.environ and rt_settings.verbosity == 3:
         from tqdm import tqdm
@@ -109,7 +112,7 @@ def run_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, rt_
                 R_ts[t] = len(R[0])
 
             if R0_struct:
-                'do stuff to update RO'
+                a = None
 
             # if save_options.save_max_d:
                 # max_d_ts[t] = get_max_d(I)
@@ -145,7 +148,7 @@ def run_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, rt_
     if max_d_ts:
         sim_result['max_d'] = max_d_ts
 
-    if S_ts or I_ts or R_ts:
+    if save_options.save_field_time_series:
         S_ts, I_ts, R_ts = S_ts[:t], I_ts[:t], R_ts[:t]
         sim_result['SIR_fields'] = {'S': S_ts, 'I': I_ts, 'R': R_ts}
 
