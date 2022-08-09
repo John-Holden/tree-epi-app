@@ -33,10 +33,10 @@ function InputParameters() {
  const infectivityBeta = '\\beta';
  const densityRho = '\\rho';
  const [spinner, setSpinner] = useState(false);  
- const [S_field, setS_field] = useState([1, 2, 3])
- const [I_field, setI_field] = useState([1, 2, 3])
- const [R_field, setR_field] = useState([4, 5, 6])
- const [t_field, setT_field] = useState([1, 3, 5])
+ const [S_field, setS_field] = useState([0])
+ const [I_field, setI_field] = useState([0])
+ const [R_field, setR_field] = useState([0])
+ const [t_field, setT_field] = useState([0])
 
 
   // Update R0 value, conditional on density, infectivity, & infectious lifetime 

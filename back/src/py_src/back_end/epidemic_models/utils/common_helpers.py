@@ -7,7 +7,7 @@ import numpy as np
 import datetime as dt
 from typing import Optional, List
 from py_src.params_and_config import (DomainConfig, Compartmentalised_models, GenericSimulationConfig, SaveOptions, 
-                                      RuntimeSettings, PATH_TO_TEMP_STORE)
+                                      RuntimeSettings, PATH_TO_TEMP_CPP_STORE)
 
 
 def time_print(time_seconds: int, msg: Optional[str] = 'Simulation done in: ', display: Optional[bool] = True) -> str:
@@ -112,7 +112,9 @@ def write_simulation_params(sim_context: GenericSimulationConfig, save_options: 
     Write simulation parameters to json file & return save location - loaded in by c++ executable
     """
     
-    sim_write_loc = f'{PATH_TO_TEMP_STORE}{dt.datetime.now().strftime("%d%m%Y%H%M%S")}'
+    sim_write_loc = f'{PATH_TO_TEMP_CPP_STORE}{dt.datetime.now().strftime("%d%m%Y%H%M%S")}'
+    logger('[i] Writing sim parameters & config to: {PATH_TO_TEMP_CPP_STORE}')
+
     if os.path.exists(sim_write_loc):
         raise Exception(f'Path {sim_write_loc} already exists!')
     else:

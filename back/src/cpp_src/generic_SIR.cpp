@@ -12,7 +12,8 @@ using std::vector;
 
 class Simulation{
     
-    public: int Execute(char* SimInputPath){ 
+    public: int Execute(char* SimInputPath){
+            std:: cout << SimInputPath << std :: endl;
             Json::Value ParamRoot {LoadJson(SimInputPath)};
             vector<vector<int>> S {LoadS(SimInputPath)};
             vector<vector<int>> I {LoadI(SimInputPath)};

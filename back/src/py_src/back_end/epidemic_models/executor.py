@@ -1,3 +1,4 @@
+from cmath import log
 import ctypes
 import datetime as dt
 import imp
@@ -169,9 +170,10 @@ def generic_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions,
 def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, runtime_settings: RuntimeSettings):
     """C-bindigns that call pre-compiled simulation code"""
     from ctypes import cdll
+    import os
 
-    logger('execute_cpp_SIR - loading library and running compiled simulation')
-    
+    logger('[i] execute_cpp_SIR - loading library and running compiled simulation')
+
     lib = cdll.LoadLibrary(f'{PATH_TO_CPP_EXECUTABLE}/libSIR.so')
     class SimulationExecutor:
         def __init__(self):
