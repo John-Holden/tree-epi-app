@@ -1,10 +1,6 @@
-from cmath import log
 import ctypes
 import datetime as dt
-import imp
 from operator import le
-from traceback import print_tb
-from xml import dom
 import numpy as np
 from py_src.back_end.epidemic_models.compartments import SIR
 from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR, R0_finder
@@ -38,10 +34,10 @@ def get_updates(epi_params: dict) -> float:
     """
         Calculate an estimate for R0 based on input epidemic parameters
     """
-    host_number = int(epi_params['host_number'])
+    host_number = int(epi_params['host_number']) if epi_params['host_number'] != '' else 0 
     domain_size = tuple(map(int, epi_params['domain_size']))
 
-    if not host_number:
+    if host_number < 100:
         return
 
     if not domain_size[0] * domain_size[1]:
@@ -167,10 +163,35 @@ def generic_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions,
     return sim_result['SIR_fields']
 
 
+
+def combine_SIR_fields(S, I, R):
+    # populate SIR feild of the form: x1, y1, inf_t1, status \
+    #                                 xN, y1N inf_tN, status. where status /in [1, 2, 3] 1: S 2: I 3:R
+    # i.e. assuming no R infections...
+
+    SIR_fields = np.zeros(shape=(len(S[0]) + len(I[0]) + len(R[0]), 4 )).astype(int)
+    num_S = len(S[0])
+    num_I = len(I[0])
+    assert not len(R[0])
+
+    SIR_fields[:,0][:num_S] = S[0]
+    SIR_fields[:,1][:num_S] = S[1]
+    SIR_fields[:,3][:num_S] = np.ones(num_S)
+
+    SIR_fields[:,0][num_S:] = I[0]
+    SIR_fields[:,1][num_S:] = I[1]
+    SIR_fields[:,2][num_S:] = I[2]
+    SIR_fields[:,3][num_S:] = 2 * np.ones(num_I)
+    
+    return SIR_fields
+    
+    
+
+
+
 def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions, runtime_settings: RuntimeSettings):
     """C-bindigns that call pre-compiled simulation code"""
     from ctypes import cdll
-    import os
 
     logger('[i] execute_cpp_SIR - loading library and running compiled simulation')
 
@@ -188,7 +209,10 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
         start = dt.datetime.now()
         sim_name = write_simulation_params(sim_context, save_options, runtime_settings)
         S, I, R = set_SIR(sim_context.domain_config, sim_context.initial_conditions, sim_context.infectious_lt)
-        write_SIR_fields(sim_name, S, I, R)
+        
+        SIR_fields = combine_SIR_fields(S, I, R)
+
+        write_SIR_fields(sim_name, SIR_fields)
         out = sim_handler.Execute(sim_name)
         elapsed = dt.datetime.now() - start
     except Exception as e:

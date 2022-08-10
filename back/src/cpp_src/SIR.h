@@ -21,12 +21,12 @@ int SetI(string DistType, int InitInfected, int PatchSz[2], int InfectedLT)
     return 0;
 };
 
-vector<vector<int>> LoadS(string SimLocation)
+vector<vector<int>> LoadSIR(string SimLocation)
 {   
     int val;
-    string line, line1;
+    string line;
     vector<int> dataField;
-    fstream CSVfile (SimLocation+"/S.csv", ios::in);
+    fstream CSVfile (SimLocation+"/SIR.csv", ios::in);
     if(!CSVfile.is_open()) throw std::runtime_error("Error could not open file in " + SimLocation);
     if (CSVfile.good()) {} else {throw std::runtime_error("Error detected in file stream!");}
     // todo 1) re-write files to field loc, S, I, R. where loc is x,y
@@ -46,18 +46,4 @@ vector<vector<int>> LoadS(string SimLocation)
     vector<vector<int>> S = { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} };
 
     return S;
-}
-
-vector<vector<int>> LoadI(string SimLocation)
-{   
-    // TODO: load SIR fields from input param csv
-    vector<vector<int>> I = { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} };
-    return I;
-}
-
-
-vector<vector<int>> LoadR(string SimLocation)
-{   
-    vector<vector<int>> R = { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} };
-    return R;
 }

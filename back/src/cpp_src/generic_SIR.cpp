@@ -13,11 +13,9 @@ using std::vector;
 class Simulation{
     
     public: int Execute(char* SimInputPath){
-            std:: cout << SimInputPath << std :: endl;
+            std:: cout << "[i] Entered into cpp binary. Loading inputs..." << std :: endl;
             Json::Value ParamRoot {LoadJson(SimInputPath)};
-            vector<vector<int>> S {LoadS(SimInputPath)};
-            vector<vector<int>> I {LoadI(SimInputPath)};
-            vector<vector<int>> R {LoadR(SimInputPath)};
+            vector<vector<int>> S {LoadSIR(SimInputPath)};
             return 0;
         }
 };

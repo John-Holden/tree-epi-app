@@ -150,16 +150,11 @@ def write_simulation_params(sim_context: GenericSimulationConfig, save_options: 
     return sim_write_loc
 
 
-def write_SIR_fields(sim_save_loc: str, S: List[np.ndarray], I: List[np.ndarray], R: List[np.ndarray]) -> None:
+def write_SIR_fields(sim_save_loc: str, SIR_fields) -> None:
     """
     Write SI fields to csv (should be no R fields at t=0)
     """
-    S_ = np.zeros(shape=(2, len(S[0]))).astype(int)
-    I_ = np.zeros(shape=(3, len(I[0]))).astype(int)
-    S_[0], S_[1] = S[0], S[1]
-    I_[0], I_[1], I_[2] = I[0], I[1], I[2]
-    np.savetxt(f'{sim_save_loc}/S.csv', S_, fmt='%i', delimiter=',')
-    np.savetxt(f'{sim_save_loc}/I.csv', I_, fmt='%i', delimiter=',')
+    np.savetxt(f'{sim_save_loc}/SIR.csv', SIR_fields, fmt='%i', delimiter=',')
 
         
 def get_env_var(var: str):

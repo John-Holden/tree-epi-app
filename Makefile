@@ -34,11 +34,17 @@ rebuild-front: ## Rebuild react app, build new image & run frontend container in
 	make quick-build SERVICE=frontend
 	make up SERVICE=frontend
 
+compile_SIR:
+	docker exec tree-epi-back /bin/bash -c "cd tree-epi-back/cpp_src/ && \
+		g++ -c -fPIC generic_SIR.cpp -o generic_SIR.o -ljsoncpp &&\
+		g++ -shared -Wl,-soname,libSIR.so -o libSIR.so  generic_SIR.o -ljsoncpp \
+		"
+
 rebuild-back:
 	make stop SERVICE=backend
-	cd back/ && make compile_SIR
 	make quick-build SERVICE=backend
 	make up SERVICE=backend
+	make compile_SIR
 
 follow-logs-back:
 	docker logs --follow tree-epi-back
@@ -48,3 +54,6 @@ follow-logs-front:
 
 exec:
 	docker exec -it ${SERVICE} /bin/bash
+
+pytest:
+
