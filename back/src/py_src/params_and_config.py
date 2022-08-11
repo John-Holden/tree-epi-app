@@ -174,6 +174,10 @@ class BCDconfType(BaseType):
     def validate(self, value, context=None):
         assert isinstance(value, Other_boundary_conditions)
 
+class EpiParamType(BaseType):
+    def validate(self, value, context=None):
+        assert isinstance(value, Epidemic_parameters)
+
 
 # --------------Dispersal functions-------------- #
 def ga_dispersal_func(dist: Union[np.ndarray, float], ell: float):
@@ -455,9 +459,12 @@ class GenericSimulationConfig(Model):
     domain_config: DomainConfig = DomainConfType(required=True)
     initial_conditions: Initial_conditions = InitCondType(required=True)
     infection_dynamics: Infection_dynamics = InfectionType(required=True)
+    epidemic_params: Epidemic_parameters = EpiParamType(required=False)
     R0_trace: Union[None, R0_tracker] = R0ConfigType(required=False, default=None)
     other_boundary_conditions: Other_boundary_conditions = BCDconfType(required=False,
                                                                        default=Other_boundary_conditions(False, False))
+
+
     exposed_lt = None
     sporulation = None
 

@@ -3,11 +3,11 @@ import datetime as dt
 from operator import le
 import numpy as np
 from py_src.back_end.epidemic_models.compartments import SIR
-from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR, R0_finder
+from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR, R0_finder, set_I_lt
 from py_src.back_end.epidemic_models.utils.common_helpers import (get_tree_density, get_model_name, logger, write_simulation_params,
                                                                   write_SIR_fields, get_env_var)
 
-from py_src.params_and_config import (PATH_TO_CPP_EXECUTABLE, GenericSimulationConfig, RuntimeSettings, SaveOptions, 
+from py_src.params_and_config import (PATH_TO_CPP_EXECUTABLE, GenericSimulationConfig, Infection_dynamics, RuntimeSettings, SaveOptions, 
                                       set_dispersal, set_domain_config, set_runtime, set_infectious_lt, set_initial_conditions, 
                                       set_infection_dynamics, set_R0_trace, set_epidemic_parameters)
     
@@ -164,11 +164,11 @@ def generic_SIR(sim_context: GenericSimulationConfig, save_options: SaveOptions,
 
 
 
-def combine_SIR_fields(S, I, R):
+def combine_SIR_fields(S, I, R, inf_lt):
     # populate SIR feild of the form: x1, y1, inf_t1, status \
     #                                 xN, y1N inf_tN, status. where status /in [1, 2, 3] 1: S 2: I 3:R
     # i.e. assuming no R infections...
-
+    
     SIR_fields = np.zeros(shape=(len(S[0]) + len(I[0]) + len(R[0]), 4 )).astype(int)
     num_S = len(S[0])
     num_I = len(I[0])
@@ -180,9 +180,11 @@ def combine_SIR_fields(S, I, R):
 
     SIR_fields[:,0][num_S:] = I[0]
     SIR_fields[:,1][num_S:] = I[1]
-    SIR_fields[:,2][num_S:] = I[2]
     SIR_fields[:,3][num_S:] = 2 * np.ones(num_I)
     
+    # Pre-populate all positions with infectious lifetimes - saves recaculating per step
+    SIR_fields[:, 2] = set_I_lt(inf_lt, num_S + num_I, t=0) 
+
     return SIR_fields
     
     
@@ -207,11 +209,17 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
     try:
         sim_handler = SimulationExecutor()
         start = dt.datetime.now()
-        sim_name = write_simulation_params(sim_context, save_options, runtime_settings)
-        S, I, R = set_SIR(sim_context.domain_config, sim_context.initial_conditions, sim_context.infectious_lt)
         
-        SIR_fields = combine_SIR_fields(S, I, R)
-
+        epidemic_parameters = set_epidemic_parameters(sim_context.domain_config.tree_density,
+                                                  sim_context.infection_dynamics.beta_factor,
+                                                  sim_context.dispersal,
+                                                  sim_context.sporulation)
+        
+        sim_context.epidemic_params = epidemic_parameters
+        
+        sim_name = write_simulation_params(sim_context, save_options, runtime_settings)
+        S, I, R = set_SIR(sim_context.domain_config, sim_context.initial_conditions, sim_context.infectious_lt)        
+        SIR_fields = combine_SIR_fields(S, I, R, sim_context.infectious_lt)
         write_SIR_fields(sim_name, SIR_fields)
         out = sim_handler.Execute(sim_name)
         elapsed = dt.datetime.now() - start

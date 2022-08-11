@@ -47,7 +47,7 @@ rebuild-back:
 	make compile_SIR
 
 follow-logs-back:
-	docker logs --follow tree-epi-back
+	docker logs --since 20s --follow tree-epi-back
 
 follow-logs-front:
 	docker logs --follow tree-epi-front
@@ -57,3 +57,6 @@ exec:
 
 pytest:
 
+
+purge-logs:
+	echo "" > $(docker inspect --format='{{.LogPath}}' ${SERVICE})

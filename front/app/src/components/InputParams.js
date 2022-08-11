@@ -128,7 +128,7 @@ function InputParameters() {
           <label style={labelSize}> <strong> Tree density <InlineMath math={densityRho}/> = {density} </strong></label>
           <p></p>
           <label style={labelSize}>  <InlineMath math={susceptibleHosts}/> Hosts = </label>
-          <input className='inputBox' type="number" min="100" max="2000" value={hostNumber} onChange={e => setHostNumber(e.target.value)}/>   
+          <input className='inputBox' type="number" min="10" max="2000" value={hostNumber} onChange={e => setHostNumber(e.target.value)}/>   
           <progress value={hostNumber} max="2000"></progress> 
           <p></p>
           <label style={labelSize}> <InlineMath math={infectedHosts}/> Hosts = </label>

@@ -154,7 +154,10 @@ def write_SIR_fields(sim_save_loc: str, SIR_fields) -> None:
     """
     Write SI fields to csv (should be no R fields at t=0)
     """
-    np.savetxt(f'{sim_save_loc}/SIR.csv', SIR_fields, fmt='%i', delimiter=',')
+    np.savetxt(f'{sim_save_loc}/pos_x.csv', SIR_fields[:,0], fmt='%i', delimiter=',')
+    np.savetxt(f'{sim_save_loc}/pos_y.csv', SIR_fields[:,1], fmt='%i', delimiter=',')
+    np.savetxt(f'{sim_save_loc}/inf_lt.csv', SIR_fields[:,2], fmt='%i', delimiter=',')
+    np.savetxt(f'{sim_save_loc}/stat.csv', SIR_fields[:,3], fmt='%i', delimiter=',')
 
         
 def get_env_var(var: str):
