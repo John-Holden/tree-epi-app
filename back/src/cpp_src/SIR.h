@@ -4,6 +4,7 @@
 #include <fstream>
 #include <jsoncpp/json/json.h>
 #include <math.h>       /* sqrt */
+#include <set>
 
 using namespace std; // use all std object names etc. 
 using std :: vector;
@@ -18,6 +19,15 @@ void PrintVect1 (const vector<int>& v){
   //vector<int> v;
   for (int i=0; i<v.size();i++){
     cout << v[i] << endl;
+  }
+}
+
+
+// print a vector
+void PrintSet (const set<int>& s)  {
+  //set<int> s;
+  for (auto i : s) {
+      cout << i << endl;
   }
 }
 
@@ -62,26 +72,22 @@ bool isInfected(float infectPr) {
 
 
 // Find newly infected trees, return array with update infection states 
-vector <int> evolveStep(vector <int> xPos, vector <int> yPos, vector <int> Ilt, vector <int> stat, Json::Value simContext) {
-    cout << "[i] Evolving step..." << endl;
-    cout << simContext << endl;
+set <int> getNewInfected(vector <int> xPos, vector <int> yPos, vector <int> Ilt, vector <int> stat, Json::Value simContext) {
     
+    // init variables     
     int num_hosts = xPos.size();
-    vector <int> newInfected(xPos.size(), 0);
-    
+    set<int> newInfected;
+
     // Fields have values: S == 1 && I == 2 && R == 3
     for (int index=0; index<num_hosts; index++) {
         if ( stat[index] != 2 ) {
             // Skip anything not infected
             continue;  
         }
-        
-        cout << "we have infected @ "  << endl;
-        cout << xPos[index] << " " <<yPos[index] << endl;
+    
 
         // get new infections due to infected tree
         for (int index1=0; index1<num_hosts; index1++) {
-            cout << "[i] Finding new infections due to I_index" << endl;
             
             if ( index1 == index  ) {
                 // Skip self-infections
@@ -100,15 +106,31 @@ vector <int> evolveStep(vector <int> xPos, vector <int> yPos, vector <int> Ilt, 
             if (!isInfected(pr) ) {
                 continue;
             }
+            
+            newInfected.insert(index1);
+        }
+    }
+ 
+    return newInfected;
+}
 
-            // Update state to infectious
-            newInfected[index1] = 1;
+
+// Find new removed trees based on pre-calculated lifetimes
+vector<int> getNewRemoved(int t, vector <int> Ilt, vector <int> Ilt_count, vector <int> stat) {
+    vector<int> newRemoved;
+    for (int i=0; i < Ilt.size(); i++) {
+        if (!stat[i] == 2) {
+            // only infecteds transition
+            continue;
         }
 
-        cout << "finished index1 loop" << endl;
-        PrintVect1(newInfected);
+        if (!t == Ilt[i] + Ilt_count[i]) {
+            // only transition at given time
+            continue;
+        }
+
+        newRemoved.push_back(i);
     }
 
-    return vector <int> {0, 1, 2};
-
+    return newRemoved;
 }

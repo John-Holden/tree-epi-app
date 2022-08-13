@@ -17,6 +17,10 @@ services:
       volumes:
         - ./back/src:/${BACKEND_NAME}
         - ./sim-uploads:${ANIM_SAVE_DEST}
+      logging:
+        options:
+          max-size: "10m"
+          max-file: "3"
 
       entrypoint: ./run_back.sh
       environment:
