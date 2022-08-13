@@ -24,37 +24,38 @@ class Simulation{
             vector<int> inf_l {LoadField( std :: string(SimInputPath) + "/inf_lt.csv") };
             vector<int> stat {LoadField( std :: string(SimInputPath) + "/stat.csv") };
             vector<int> inf_l_count(pos_x.size(), 0); // time becoming infected
-        
             int steps = ParamRoot["runtime"]["steps"].asInt();
+            bool exceededSteps = false;
 
             // iterate over steps
             for (int t=0; t<steps; t++){
                 cout << "[i] Computing step : " << t << endl;
 
                 // update removed status
-                cout << "inf lifetimes before" << endl;
-                PrintVect(stat);
                 vector<int> newRem = getNewRemoved(t, inf_l, inf_l_count, stat); 
                 for (auto index : newRem) {
                     stat[index] = 3;
                     }   
-                    
-                cout << "after removal" << endl;
-                PrintVect(stat);
+
+                if (isExinction(stat)) {
+                    cout << "[i] Exiting, no infecteds remain." << endl;
+                    break;
+                }
 
                 // update infection status
                 set<int> newInf = getNewInfected(pos_x, pos_y, inf_l, stat, ParamRoot);
                 for (auto index : newInf) {
                     stat[index] = 2;
                     inf_l_count[index] = t;
-                    }   
+                    }
 
-                
-
-
+                if (isTimeHorizon(t, steps)) {
+                    cout << "[i] Exiting, exceeded the time horizon";
+                    exceededSteps = true;
+                   }                
             }
-            
 
+            cout << "[i] Finished computing simulation." << endl;
 
             return 0;
         }

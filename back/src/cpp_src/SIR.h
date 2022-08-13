@@ -75,38 +75,40 @@ bool isInfected(float infectPr) {
 set <int> getNewInfected(vector <int> xPos, vector <int> yPos, vector <int> Ilt, vector <int> stat, Json::Value simContext) {
     
     // init variables     
-    int num_hosts = xPos.size();
+    int numHosts = xPos.size();
+    float dist, pr;
     set<int> newInfected;
 
-    // Fields have values: S == 1 && I == 2 && R == 3
-    for (int index=0; index<num_hosts; index++) {
+
+    // fields have values: S == 1 && I == 2 && R == 3
+    for (int index=0; index<numHosts; index++) {
+        // skip anything not infected
         if ( stat[index] != 2 ) {
-            // Skip anything not infected
             continue;  
         }
-    
 
-        // get new infections due to infected tree
-        for (int index1=0; index1<num_hosts; index1++) {
+        // get new infections due to i^th infected tree
+        for (int index1=0; index1<numHosts; index1++) {
             
+            // skip self-infections
             if ( index1 == index  ) {
-                // Skip self-infections
                 continue;  
             }
 
+            // skip other infections - cannot re-infect infected
             if (stat[index1] == 2) {
-                // skip other infections - cannot re-infect infected
                 continue;
             }
 
             // work out transitions (S_i --> I_i) due to I_index
-            float dist = getDistance(xPos[index], xPos[index1], yPos[index], yPos[index1]);
-            float pr = infectionPr(dist, simContext["dispersal"], simContext["epidemic_params"]);
+            dist = getDistance(xPos[index], xPos[index1], yPos[index], yPos[index1]);
+            pr = infectionPr(dist, simContext["dispersal"], simContext["epidemic_params"]);
                         
             if (!isInfected(pr) ) {
                 continue;
             }
             
+            // new transition S --> I
             newInfected.insert(index1);
         }
     }
@@ -117,20 +119,44 @@ set <int> getNewInfected(vector <int> xPos, vector <int> yPos, vector <int> Ilt,
 
 // Find new removed trees based on pre-calculated lifetimes
 vector<int> getNewRemoved(int t, vector <int> Ilt, vector <int> Ilt_count, vector <int> stat) {
+    
     vector<int> newRemoved;
     for (int i=0; i < Ilt.size(); i++) {
-        if (!stat[i] == 2) {
-            // only infecteds transition
+    
+        // only infecteds transition
+        if (stat[i] != 2) {
             continue;
         }
 
+        // only transition at given time
         if (!t == Ilt[i] + Ilt_count[i]) {
-            // only transition at given time
             continue;
         }
 
+        // otherwise, new transition I --> R
         newRemoved.push_back(i);
     }
 
     return newRemoved;
 }
+
+
+// True if no infected trees remain
+bool isExinction(vector<int> stat) {
+    for (int i=0; i<stat.size(); i++) {
+        if (stat[i] == 2) {
+            return false;
+        } 
+    }
+    return true;
+}
+
+// Reached the maximum number of time steps
+bool isTimeHorizon(int t, int steps) {
+    if (t+1==steps) {
+        return true;
+    }
+    return false;
+}
+
+
