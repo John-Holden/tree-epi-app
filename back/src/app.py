@@ -26,6 +26,7 @@ def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_
     mkdir_tmp_store(get_env_var('FRAME_SAVE_DEST'))
     ## TODO execute compiled c++ version of the algorithm
     execute_cpp_SIR(sim_config, save_options, rt_settings)
+    # return 0
     return generic_SIR(sim_config, save_options, rt_settings)
 
 

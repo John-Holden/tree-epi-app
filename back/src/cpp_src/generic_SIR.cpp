@@ -25,20 +25,22 @@ class Simulation{
             vector<int> stat {LoadField( std :: string(SimInputPath) + "/stat.csv") };
             vector<int> inf_l_count(pos_x.size(), 0); // time becoming infected
             int steps = ParamRoot["runtime"]["steps"].asInt();
+            int hostNumber = pos_x.size();
             bool exceededSteps = false;
+            
 
             // iterate over steps
             for (int t=0; t<steps; t++){
-                cout << "[i] Computing step : " << t << endl;
+                cout << "[i] Computing step : " << t << " #infected = "<< infectedNumber(stat) << endl;
 
                 // update removed status
-                vector<int> newRem = getNewRemoved(t, inf_l, inf_l_count, stat); 
+                vector<int> newRem = getNewRemoved(t, inf_l, inf_l_count, stat);
                 for (auto index : newRem) {
                     stat[index] = 3;
                     }   
 
                 if (isExinction(stat)) {
-                    cout << "[i] Exiting, no infecteds remain." << endl;
+                    cout << "[i] Exiting, no infecteds remain" << endl;
                     break;
                 }
 
@@ -48,9 +50,9 @@ class Simulation{
                     stat[index] = 2;
                     inf_l_count[index] = t;
                     }
-
+                
                 if (isTimeHorizon(t, steps)) {
-                    cout << "[i] Exiting, exceeded the time horizon";
+                    cout << "[i] Exiting, exceeded the time horizon" << endl;
                     exceededSteps = true;
                    }                
             }
@@ -62,12 +64,8 @@ class Simulation{
 };
 
 
-
-
-
-
-
 extern "C" {
     Simulation* newSimOjb(){ return new Simulation(); }
     int execute(Simulation* simulation, char* SimPath){ return simulation->Execute(SimPath); }
     }
+// 

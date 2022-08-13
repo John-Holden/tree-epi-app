@@ -95,12 +95,13 @@ set <int> getNewInfected(vector <int> xPos, vector <int> yPos, vector <int> Ilt,
                 continue;  
             }
 
-            // skip other infections - cannot re-infect infected
-            if (stat[index1] == 2) {
+            // skip anything other than susceptible
+            if (stat[index1] != 1 ) {
                 continue;
             }
 
             // work out transitions (S_i --> I_i) due to I_index
+
             dist = getDistance(xPos[index], xPos[index1], yPos[index], yPos[index1]);
             pr = infectionPr(dist, simContext["dispersal"], simContext["epidemic_params"]);
                         
@@ -129,7 +130,7 @@ vector<int> getNewRemoved(int t, vector <int> Ilt, vector <int> Ilt_count, vecto
         }
 
         // only transition at given time
-        if (!t == Ilt[i] + Ilt_count[i]) {
+        if (t != Ilt[i] + Ilt_count[i]) {
             continue;
         }
 
@@ -153,10 +154,47 @@ bool isExinction(vector<int> stat) {
 
 // Reached the maximum number of time steps
 bool isTimeHorizon(int t, int steps) {
-    if (t+1==steps) {
+    if (t+1 == steps) {
         return true;
     }
     return false;
 }
 
+// count number of infected trees
+int infectedNumber(vector<int> stat) {
+int count = 0;
+for (int i=0; i < stat.size(); i++) {
+    if (stat[i] != 2) {
+        continue;
+    }
+    
+    count++;
+}
+return count;
+}
 
+// count number of infected trees
+int removedNumber(vector<int> stat) {
+int count = 0;
+for (int i=0; i < stat.size(); i++) {
+    if (stat[i] != 3) {
+        continue;
+    }
+    
+    count++;
+}
+return count;
+}
+
+// count number of infected trees
+int susceptibleNumber(vector<int> stat) {
+int count = 0;
+for (int i=0; i < stat.size(); i++) {
+    if (stat[i] != 1) {
+        continue;
+    }
+    
+    count++;
+}
+return count;
+}
