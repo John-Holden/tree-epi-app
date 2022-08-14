@@ -58,3 +58,36 @@ vector<int> LoadField(string SimName)
     
     return dataField;
 }
+
+
+// write vector v to text.txt
+void writeField(vector<int> v, string saveName){
+	ofstream file;
+	file.open(saveName);
+	for(int i=0;i<v.size();++i){
+		file<<v[i]<<"\n";
+	}  
+	file.close();
+}
+
+
+// stupid func to signal end of sim
+void writeEnd(string SimName) {
+  ofstream file;
+	file.open(SimName+"/end");
+	file.close();
+}
+
+// Save in correct format
+string frameLabel(int t) {
+  if (t < 10) {
+    return "000" + to_string(t);
+  }
+  else if (t < 100) {
+    return "00" + to_string(t);
+  }
+  else if (t < 1000) {
+    return "0" + to_string(t);
+  }
+  return to_string(t);
+}

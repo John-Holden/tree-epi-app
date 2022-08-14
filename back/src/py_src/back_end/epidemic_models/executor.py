@@ -1,7 +1,9 @@
+import os
 import ctypes
-import datetime as dt
-from operator import le
+from time import sleep
 import numpy as np
+import datetime as dt
+from multiprocessing import Process
 from py_src.back_end.epidemic_models.compartments import SIR
 from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR, R0_finder, set_I_lt
 from py_src.back_end.epidemic_models.utils.common_helpers import (get_tree_density, get_model_name, logger, write_simulation_params,
@@ -221,7 +223,14 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
         S, I, R = set_SIR(sim_context.domain_config, sim_context.initial_conditions, sim_context.infectious_lt)        
         SIR_fields = combine_SIR_fields(S, I, R, sim_context.infectious_lt)
         write_SIR_fields(sim_name, SIR_fields)
-        out = sim_handler.Execute(sim_name)
+
+        p1 = Process(target=sim_handler.Execute, args=(sim_name,))
+        p1.start()
+        p2 = Process(target=parallel_anim, args=(sim_name,))
+        p2.start()
+        p1.join()
+        p2.join()
+    
         elapsed = dt.datetime.now() - start
     except Exception as e:
         elapsed = dt.datetime.now() - start
@@ -229,3 +238,20 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
         raise e
 
     logger(f'execute_cpp_SIR - finished in {elapsed} (s)')
+
+
+
+def parallel_anim(sim_locations: str):
+    print("[i Animating in parallell")
+    sleep(0.25)
+    print("[i] files in sim loc...", os.listdir(sim_locations))
+    # write poll func to animate save data..
+    if "end" in os.listdir(sim_locations):
+        print("end in sim")
+    
+    # while True:
+    #     # print(os.listdir(sim))
+        # if 
+
+
+    return

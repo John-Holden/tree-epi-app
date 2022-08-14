@@ -1,13 +1,11 @@
 """
 Simple flask app to handle incoming simulationrequests
 """
-from operator import le
 import os
 import subprocess
 import datetime as dt
 from flask_cors import CORS
 from flask import Flask, jsonify, make_response, request
-from matplotlib.ft2font import LOAD_TARGET_LIGHT
 from py_src.back_end.epidemic_models.utils.common_helpers import logger, get_env_var
 from py_src.back_end.epidemic_models.executor import execute_cpp_SIR, get_simulation_config, generic_SIR, get_updates
 from py_src.params_and_config import (mkdir_tmp_store, GenericSimulationConfig, SaveOptions, RuntimeSettings)
@@ -26,7 +24,7 @@ def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_
     mkdir_tmp_store(get_env_var('FRAME_SAVE_DEST'))
     ## TODO execute compiled c++ version of the algorithm
     execute_cpp_SIR(sim_config, save_options, rt_settings)
-    # return 0
+
     return generic_SIR(sim_config, save_options, rt_settings)
 
 
@@ -78,7 +76,6 @@ def simulation_request_handler():
     except Exception as e:
         logger(f'[e] Simulation failed: {e}')
         return make_response(jsonify(error=f'{e}'), 500)
-
 
 
 @app.route("/stateupdate", methods=['POST'])

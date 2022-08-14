@@ -16,7 +16,6 @@ double JsonToDouble(Json::Value value) {return std:: stod(value.toStyledString()
 
 // print a vector
 void PrintVect1 (const vector<int>& v){
-  //vector<int> v;
   for (int i=0; i<v.size();i++){
     cout << v[i] << endl;
   }
@@ -25,7 +24,6 @@ void PrintVect1 (const vector<int>& v){
 
 // print a vector
 void PrintSet (const set<int>& s)  {
-  //set<int> s;
   for (auto i : s) {
       cout << i << endl;
   }
@@ -101,7 +99,6 @@ set <int> getNewInfected(vector <int> xPos, vector <int> yPos, vector <int> Ilt,
             }
 
             // work out transitions (S_i --> I_i) due to I_index
-
             dist = getDistance(xPos[index], xPos[index1], yPos[index], yPos[index1]);
             pr = infectionPr(dist, simContext["dispersal"], simContext["epidemic_params"]);
                         
