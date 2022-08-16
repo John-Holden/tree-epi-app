@@ -1,9 +1,11 @@
 import os
 import ctypes
 from time import sleep
+from typing import List
 import numpy as np
 import datetime as dt
 from multiprocessing import Process
+from py_src.back_end.plotting.frame_plot import SIR_frame
 from py_src.back_end.epidemic_models.compartments import SIR
 from py_src.back_end.epidemic_models.utils.dynamics_helpers import set_SIR, R0_finder, set_I_lt
 from py_src.back_end.epidemic_models.utils.common_helpers import (get_tree_density, get_model_name, logger, write_simulation_params,
@@ -190,6 +192,32 @@ def combine_SIR_fields(S, I, R, inf_lt):
     return SIR_fields
     
     
+# Horrible function to reverse-engineer SIR fields compatible with frame_plot
+def split_SIR_fields(pos_x: np.ndarray, pos_y: np.ndarray, state: np.ndarray):
+
+    S = [[], []]
+    I = [[], []]
+    R = [[], []]
+    
+    for i in range(len(pos_x)):
+        tree = state[i]
+        if tree == 1:
+            S[0].append(pos_x[i])
+            S[1].append(pos_y[i])
+        elif tree == 2:
+            I[0].append(pos_x[i])
+            I[1].append(pos_y[i])
+        elif tree == 3:
+            R[0].append(pos_x[i])
+            R[1].append(pos_y[i])
+    
+    S[0] = np.array(S[0])
+    S[1] = np.array(S[1])   
+    I[0] = np.array(I[0])
+    I[1] = np.array(I[1])
+    R[0] = np.array(R[0])
+    R[1] = np.array(R[1])
+    return S, I , R
 
 
 
@@ -226,7 +254,7 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
 
         p1 = Process(target=sim_handler.Execute, args=(sim_name,))
         p1.start()
-        p2 = Process(target=parallel_anim, args=(sim_name,))
+        p2 = Process(target=parallel_anim, args=([sim_name, sim_context],))
         p2.start()
         p1.join()
         p2.join()
@@ -241,17 +269,35 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
 
 
 
-def parallel_anim(sim_locations: str):
-    print("[i Animating in parallell")
-    sleep(0.25)
-    print("[i] files in sim loc...", os.listdir(sim_locations))
-    # write poll func to animate save data..
-    if "end" in os.listdir(sim_locations):
-        print("end in sim")
-    
-    # while True:
-    #     # print(os.listdir(sim))
-        # if 
+def parallel_anim(anim_args: List) -> None:
+    # Parallellise animations while b/e computes code
+    sim_location: str = anim_args[0]
+    sim_context: GenericSimulationConfig = anim_args[1]
 
+    print("[i] Animating in parallell")
+    pos_x = np.loadtxt(open(f"{sim_location}/pos_x.csv", "rb"), delimiter=",").astype(int)
+    pos_y = np.loadtxt(open(f"{sim_location}/pos_y.csv", "rb"), delimiter=",").astype(int)
+    while True:
+        files_ = os.listdir(sim_location)
+        files = [file for file in files_ if "stat_" in file]
+        times = [file.split('_')[1].replace(".csv", "") for file in files]
+
+        for time, file in zip(times, files):
+            try:
+                state = np.genfromtxt(open(f"{sim_location}/{file}", "r")).astype(int)
+            except Exception as e:
+                print("Error on:")
+                print(f"{sim_location}/{file}")
+                raise e
+
+            S, I, R = split_SIR_fields(pos_x, pos_y, state)
+            SIR_frame(S, I, R, int(time), sim_context, save_frame=True)
+            os.remove(f"{sim_location}/{file}")
+
+        # Terminte if end file in directory & there is no more sims to animate
+        if "end" in files_ and not len(files):
+            print("end in files, exiting...")
+            print('FILES LEFT...====', files)
+            break
 
     return

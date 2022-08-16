@@ -1,7 +1,7 @@
 FROM debian:bullseye
 
 RUN apt-get update  && \
-    DEBIAN_FRONTEND=noninteractive apt-get -qq install python3 pip libjsoncpp-dev
+    DEBIAN_FRONTEND=noninteractive apt-get -qq install python3 pip libjsoncpp-dev ffmpeg
 
 COPY src/requirements.txt .
 RUN pip install -r requirements.txt

@@ -17,13 +17,13 @@ port = int(os.environ.get('PORT', 5000))
 app.run(debug=True, host='0.0.0.0', port=port)
 
 
-def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_settings: RuntimeSettings) -> dict:
+def simulate(sim_config: GenericSimulationConfig, save_options: SaveOptions, rt_settings: RuntimeSettings, pr_approx: bool=True) -> dict:
     """
         Simulate the spread of disease & return output SIR fields
     """
     mkdir_tmp_store(get_env_var('FRAME_SAVE_DEST'))
-    ## TODO execute compiled c++ version of the algorithm
-    execute_cpp_SIR(sim_config, save_options, rt_settings)
+    if pr_approx:
+        return execute_cpp_SIR(sim_config, save_options, rt_settings)
 
     return generic_SIR(sim_config, save_options, rt_settings)
 
