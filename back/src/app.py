@@ -34,16 +34,15 @@ def ffmegp_anim() -> str:
     """
     anim_path = get_env_var('ANIM_SAVE_DEST')
     frame_path = get_env_var('FRAME_SAVE_DEST')
+    print(frame_path, '<=---- FRAME PATH')
     dtnow = dt.datetime.now().strftime('%Y%m%d%s')
     animate_cmd = f'{anim_path}/animate.sh {frame_path} {anim_path} {dtnow}'
     process = subprocess.Popen(animate_cmd.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
 
     if get_env_var('FLASK_ENV') == 'development':
-        logger(output), 
-    
-    logger(error)
-    
+        logger(output)
+
     return dtnow
 
 
@@ -66,8 +65,9 @@ def simulation_request_handler():
     logger(f'[i] Configured & validated params in {elapsed } (s)...')
     try:
         SIR_fields = simulate(sim_config, save_options, rt_settings)
-        logger('[i] Finished succesful simulation')
         sim_location = ffmegp_anim()
+        logger('[i] Finished succesful simulation')
+
         return make_response(jsonify(video_ref=sim_location, 
                                      S=SIR_fields['S'], 
                                      I=SIR_fields['I'], 

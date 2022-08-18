@@ -1,6 +1,6 @@
 import os
 import ctypes
-from time import sleep
+import shutil
 from typing import List
 import numpy as np
 import datetime as dt
@@ -252,20 +252,36 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
         SIR_fields = combine_SIR_fields(S, I, R, sim_context.infectious_lt)
         write_SIR_fields(sim_name, SIR_fields)
 
+        # Run simulation & plotting concurrently in a bid to speed things up...
         p1 = Process(target=sim_handler.Execute, args=(sim_name,))
         p1.start()
         p2 = Process(target=parallel_anim, args=([sim_name, sim_context],))
         p2.start()
         p1.join()
         p2.join()
-    
+
+        # Load time series output
+        S = np.loadtxt(open(f"{sim_name}/S_t.csv", "rb"), delimiter=",").astype(int)
+        I = np.loadtxt(open(f"{sim_name}/I_t.csv", "rb"), delimiter=",").astype(int)
+        R = np.loadtxt(open(f"{sim_name}/R_t.csv", "rb"), delimiter=",").astype(int)
+        S = [int(i) for i in S]
+        I = [int(i) for i in I]
+        R = [int(i) for i in R]
+
         elapsed = dt.datetime.now() - start
+        logger(f'execute_cpp_SIR - finished in {elapsed} (s)')
+        
     except Exception as e:
         elapsed = dt.datetime.now() - start
         logger(f'execute_cpp_SIR - ERROR! Exiting after {elapsed} (s)', extra={"Reason": e})
         raise e
 
-    logger(f'execute_cpp_SIR - finished in {elapsed} (s)')
+    # Remove directory where sim output data is stored 
+    shutil.rmtree(sim_name)
+
+    # Return output in same format as other sim functions
+    return {"S": S, "I" : I, "R": R} 
+
 
 
 
@@ -296,8 +312,6 @@ def parallel_anim(anim_args: List) -> None:
 
         # Terminte if end file in directory & there is no more sims to animate
         if "end" in files_ and not len(files):
-            print("end in files, exiting...")
-            print('FILES LEFT...====', files)
             break
 
     return

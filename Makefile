@@ -60,3 +60,6 @@ pytest:
 
 purge-logs:
 	echo "" > $(docker inspect --format='{{.LogPath}}' ${SERVICE})
+
+clear_sims:
+	rm -rf sim-uploads/2*.mp4

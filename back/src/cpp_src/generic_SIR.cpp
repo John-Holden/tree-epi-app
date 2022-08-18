@@ -29,17 +29,16 @@ class Simulation{
             int steps = ParamRoot["runtime"]["steps"].asInt();
             int hostNumber = pos_x.size();
             bool exceededSteps = false;
-            int Snum, Inum, Rnum;
 
             // iterate over steps
             for (int t=0; t<steps; t++){
-                // Snum = susceptibleNumber(stat);
-                // Inum = infectedNumber(stat);
-                // Rnum = removedNumber(stat);
-                // S.push_back(Snum), I.push_back(Inum), R.push_back(Rnum);
-                writeField(stat, string(SimInputPath) + "/stat_" + frameLabel(t) + ".csv");                            
-
                 cout << "[i] Computing step : " + frameLabel(t) << endl;
+
+                S.push_back(susceptibleNumber(stat));
+                I.push_back(infectedNumber(stat));
+                R.push_back(removedNumber(stat));
+
+                writeField(stat, string(SimInputPath) + "/stat_" + frameLabel(t) + ".csv");                                            
 
                 // update removed status
                 vector<int> newRem = getNewRemoved(t, inf_l, inf_l_count, stat);
@@ -67,8 +66,9 @@ class Simulation{
 
             cout << "[i] Finished computing simulation." << endl;
             writeEnd(SimInputPath);
-            // writeField(I, string(SimInputPath) + "/I_t" + ".csv");
-            // writeField(R, string(SimInputPath) + "/R_t" + ".csv");                            
+            writeField(S, string(SimInputPath) + "/S_t" + ".csv");
+            writeField(I, string(SimInputPath) + "/I_t" + ".csv");
+            writeField(R, string(SimInputPath) + "/R_t" + ".csv");                            
             return 0;
         }
 };

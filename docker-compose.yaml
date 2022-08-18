@@ -1,6 +1,6 @@
 version: "3"
 
-# VARS DEFINED IN .ENV
+# ENV VARS DEFINED IN .ENV
 
 services:
   frontend:
@@ -28,5 +28,6 @@ services:
         - PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
         - FRAME_SAVE_DEST=${FRAME_SAVE_DEST}
         - ANIM_SAVE_DEST=${ANIM_SAVE_DEST}
+        - SIM_PATH=${SIM_PATH}
       container_name: ${BACKEND_NAME}
       network_mode: "host"
