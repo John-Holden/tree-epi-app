@@ -4,6 +4,8 @@ import shutil
 from typing import List
 import numpy as np
 import datetime as dt
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 from multiprocessing import Process
 from py_src.back_end.plotting.frame_plot import SIR_frame
 from py_src.back_end.epidemic_models.compartments import SIR
@@ -39,7 +41,12 @@ def get_updates(epi_params: dict) -> float:
         Calculate an estimate for R0 based on input epidemic parameters
     """
     host_number = int(epi_params['host_number']) if epi_params['host_number'] != '' else 0 
-    domain_size = tuple(map(int, epi_params['domain_size']))
+    
+
+    try:
+        domain_size = tuple(map(int, epi_params['domain_size']))
+    except Exception:
+        return
 
     if host_number < 100:
         return
@@ -53,9 +60,10 @@ def get_updates(epi_params: dict) -> float:
     if not beta_factor:
         return
 
-    inf_lt = int(epi_params['infectious_lifetime'])
-
-    if not inf_lt:
+    try:
+        inf_lt = int(epi_params['infectious_lifetime'])
+        assert inf_lt
+    except Exception:
         return
             
     dispersal_type, dispersal_param = epi_params['dispersal_type'], epi_params['dispersal_param']
@@ -253,12 +261,10 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
         write_SIR_fields(sim_name, SIR_fields)
 
         # Run simulation & plotting concurrently in a bid to speed things up...
-        p1 = Process(target=sim_handler.Execute, args=(sim_name,))
-        p1.start()
-        p2 = Process(target=parallel_anim, args=([sim_name, sim_context],))
-        p2.start()
-        p1.join()
-        p2.join()
+
+        sim_handler.Execute(sim_name)
+        sim_ref = animate_plt(sim_name, sim_context)
+        # parallel_anim([sim_name, sim_context])
 
         # Load time series output
         S = np.loadtxt(open(f"{sim_name}/S_t.csv", "rb"), delimiter=",").astype(int)
@@ -280,7 +286,7 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
     shutil.rmtree(sim_name)
 
     # Return output in same format as other sim functions
-    return {"S": S, "I" : I, "R": R} 
+    return {"S": S, "I" : I, "R": R, "sim_ref": sim_ref} 
 
 
 
@@ -315,3 +321,67 @@ def parallel_anim(anim_args: List) -> None:
             break
 
     return
+
+
+def animate_plt(sim_location: str, sim_context: GenericSimulationConfig):
+    print("[i] Animating plots")
+
+    anim_path = get_env_var('ANIM_SAVE_DEST')
+    dtnow = dt.datetime.now().strftime('%Y%m%d%s')
+
+    pos_x = np.loadtxt(open(f"{sim_location}/pos_x.csv", "rb"), delimiter=",").astype(int)
+    pos_y = np.loadtxt(open(f"{sim_location}/pos_y.csv", "rb"), delimiter=",").astype(int)
+    files = os.listdir(sim_location)
+    files = sorted([file for file in files if "stat_" in file])
+    # times = [file.split('_')[1].replace(".csv", "") for file in files]
+    state0 = np.genfromtxt(open(f"{sim_location}/{files[0]}", "r")).astype(int)
+    os.remove(f"{sim_location}/{files[0]}")
+    files = files[1:]
+
+    domain = sim_context.domain_config.patch_size
+    aspect_ratio = float(domain[0] / domain[1])
+    print('domain ', domain)
+    print('aspect ratio', aspect_ratio)
+    # Matplotlib style fixture
+    pltParams = {'figure.figsize': (7.5, 5),
+                'axes.labelsize': 15,
+                'ytick.labelsize': 20,
+                'xtick.labelsize': 20,
+                'legend.fontsize': 'x-large'}
+
+    plt.rcParams.update(pltParams)
+
+    fig, ax = plt.subplots()
+    ax.set_aspect(1)
+    plt.axis('off')
+    plt.tight_layout()
+
+    from matplotlib.colors import ListedColormap
+
+    colors = ['xkcd:green', "xkcd:red", 'xkcd:black']
+    cmap = ListedColormap(colors)
+    scat = ax.scatter(pos_x, pos_y, c=state0, cmap=cmap, s=17, vmin=1, vmax=3)
+
+    title = ax.text(0.10 ,1.1, "", bbox={'facecolor':'w', 'alpha':0.5, 'pad':5},
+                transform=ax.transAxes, ha="center")
+
+
+    def update_plot(i, files, title, scat):
+        state = np.genfromtxt(open(f"{sim_location}/{files[i]}", "r")).astype(int)
+        scat.set_array(state)
+        title.set_text(rf"T = {i} | $\rho$ = {sim_context.epidemic_params.rho},")
+        return scat,
+
+    ani = animation.FuncAnimation(fig, update_plot, frames=range(len(files)),
+                                  fargs=(files, title, scat))
+
+    ani.save(f"{anim_path}/{dtnow}.mp4")
+    plt.close()
+    for file in files:
+        os.remove(f"{sim_location}/{file}")
+
+    print("[i] Finished animating")
+
+    return dtnow
+
+

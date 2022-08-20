@@ -426,9 +426,9 @@ def set_domain_config(domain_type: str, scale_constant: int, tree_density: float
         raise Exception(f'ash dieback simulations configured for 5m only, found alpha = {scale_constant}')
     try:
         if domain_type == 'simple_square':
-            assert patch_size[0] <= 2000 and patch_size[1] <= 2000
+            assert patch_size[0] <= 5000 and patch_size[1] <= 5000
     except Exception:
-        raise Exception(f'domain is too large, max size f{2000, 2000}')
+        raise Exception(f'domain is too large, max size f{5000, 5000}')
 
     return DomainConfig(domain_type, scale_constant, tree_density, patch_size, ADB_mode)
 

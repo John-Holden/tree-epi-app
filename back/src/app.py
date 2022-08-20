@@ -64,15 +64,14 @@ def simulation_request_handler():
     elapsed = dt.datetime.now() - start
     logger(f'[i] Configured & validated params in {elapsed } (s)...')
     try:
-        SIR_fields = simulate(sim_config, save_options, rt_settings)
-        sim_location = ffmegp_anim()
+        output = simulate(sim_config, save_options, rt_settings)
         logger('[i] Finished succesful simulation')
 
-        return make_response(jsonify(video_ref=sim_location, 
-                                     S=SIR_fields['S'], 
-                                     I=SIR_fields['I'], 
-                                     R=SIR_fields['R'],
-                                     t=[i for i in range(len(SIR_fields['S']))]), 200)
+        return make_response(jsonify(video_ref=output['sim_ref'], 
+                                     S=output['S'], 
+                                     I=output['I'], 
+                                     R=output['R'],
+                                     t=[i for i in range(len(output['S']))]), 200)
     except Exception as e:
         logger(f'[e] Simulation failed: {e}')
         return make_response(jsonify(error=f'{e}'), 500)

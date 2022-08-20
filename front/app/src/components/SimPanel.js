@@ -27,7 +27,7 @@ function SimulationPanel( props ) {
   const simulation = require(`${videoRef}`)
   return (
       <div className='simulationPanel'> 
-          <video src={simulation} type="video/mp4" controls> </video> 
+          <video width="750" height="500"  src={simulation} type="video/mp4" controls> </video> 
       </div>
   );
 }

@@ -31,8 +31,8 @@ class Simulation{
             bool exceededSteps = false;
 
             // iterate over steps
+            cout << "[i] Computing " << steps << " steps" << endl;
             for (int t=0; t<steps; t++){
-                cout << "[i] Computing step : " + frameLabel(t) << endl;
 
                 S.push_back(susceptibleNumber(stat));
                 I.push_back(infectedNumber(stat));
@@ -47,7 +47,7 @@ class Simulation{
                     }   
 
                 if (isExinction(stat)) {
-                    cout << "[i] Exiting, no infecteds remain" << endl;
+                    cout << "[i] Exiting, no infecteds remain @t " << t << endl;
                     break;
                 }
 
@@ -59,7 +59,7 @@ class Simulation{
                     }
                 
                 if (isTimeHorizon(t, steps)) {
-                    cout << "[i] Exiting, exceeded the time horizon" << endl;
+                    cout << "[i] Exiting, exceeded the time horizon @t " << t << endl;
                     exceededSteps = true;
                    }
             }

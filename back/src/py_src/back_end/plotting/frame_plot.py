@@ -25,25 +25,6 @@ def frame_label(step):
         return str(step)
 
 
-# def SIR_fields(ens_df: DataFrame, fields: str, save_label: str):
-#     import seaborn as sns
-#     sns.set_theme(style='whitegrid')
-
-#     fig, ax = plt.subplots(figsize=(10, 8))
-
-#     if 'S' in fields:
-#         sns.lineplot(data=ens_df, x="t", y="S", ax=ax, hue='type')
-#     if 'I' in fields:
-#         sns.lineplot(data=ens_df, x="t", y="I", ax=ax, hue='type')
-#     if 'R' in fields:
-#         sns.lineplot(data=ens_df, x="t", y="R", ax=ax, hue='type')
-
-#     plt.legend([], [], frameon=False)
-#     plt.tick_params(axis='both', labelsize=18)
-#     plt.savefig(f'SIR-fields-{save_label}.pdf')
-#     plt.show()
-
-
 def SIR_frame(S: List[np.ndarray], I: List[np.ndarray], R: List[np.ndarray], t: int,
               sim_context: GenericSimulationConfig, save_frame: Optional[bool] = False,
               show_frame: Optional[bool] = True, ext: Optional[str] = 'png',
