@@ -1,49 +1,82 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  background-color: rgb(192, 194, 193);
+  min-height: 1000vh;
 }
 
 .App-header {
   background-color: rgb(112, 123, 143);
-  min-height: 100vh;
+  min-height: 7vh;
   display: flex;
   flex-direction:row;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  justify-content: left;
   font-size: calc(12px + 2vmin);
   color: white;
   text-align: center;
 }
 
-.spinner {
-  position: 'absolute';
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  align-items: 'center';
-  justify-content: 'center';
+
+.container{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: left;
 }
+
+.container div {
+  padding: 15px;
+  flex-direction: right;
+}
+
+.inputParamPanel{
+  flex: 0.25;  
+  font-size: large;
+  text-align: left;
+}
+
+.simulationPanel{
+  flex: 0.15;
+}
+
+.plot1{
+  flex: 0.25;
+}
+
+.inputForm{
+  align-content: center;
+}
+
+.inputBox {
+  background-color : whitesmoke;
+  color : black;
+  width: 45px;
+  border-style:solid;
+  text-align: center;
+}
+
+.inputBoxBig {
+  background-color : whitesmoke;
+  color : black;
+  width: 100px;
+  border-style:solid;
+}
+
 
 .App-link {
   color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }

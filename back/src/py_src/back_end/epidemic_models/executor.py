@@ -362,14 +362,17 @@ def animate_plt(sim_location: str, sim_context: GenericSimulationConfig):
     cmap = ListedColormap(colors)
     scat = ax.scatter(pos_x, pos_y, c=state0, cmap=cmap, s=17, vmin=1, vmax=3)
 
-    title = ax.text(0.10 ,1.1, "", bbox={'facecolor':'w', 'alpha':0.5, 'pad':5},
-                transform=ax.transAxes, ha="center")
+    # title = ax.text(0.10 ,1.1, "", bbox={'facecolor':'w', 'alpha':0.5, 'pad':5},
+    #             transform=ax.transAxes, ha="center")
+
+    title = ax.annotate(rf"$t$ = 0", xy=(0.5, 0.99), xycoords='axes fraction', fontsize=9,
+                horizontalalignment='right', verticalalignment='bottom', bbox={'facecolor':'w', 'alpha':0.5, 'pad':5})
 
 
     def update_plot(i, files, title, scat):
         state = np.genfromtxt(open(f"{sim_location}/{files[i]}", "r")).astype(int)
         scat.set_array(state)
-        title.set_text(rf"T = {i} | $\rho$ = {sim_context.epidemic_params.rho},")
+        title.set_text(rf"$t$ = {i+1}")
         return scat,
 
     ani = animation.FuncAnimation(fig, update_plot, frames=range(len(files)),

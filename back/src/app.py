@@ -4,6 +4,7 @@ Simple flask app to handle incoming simulationrequests
 import os
 import subprocess
 import datetime as dt
+
 from flask_cors import CORS
 from flask import Flask, jsonify, make_response, request
 from py_src.back_end.epidemic_models.utils.common_helpers import logger, get_env_var
@@ -83,11 +84,14 @@ def get_R0():
         Calcuate R0 based on input input parameters
     """
     start = dt.datetime.now()
-    out = get_updates(request.get_json(force=True))
-    if out is None:
+    try:
+        out = get_updates(request.get_json(force=True))
+        if out is None:
+            R0_estimated, density, beta_max = '', '', ''
+        else:
+            R0_estimated, density, beta_max = out 
+    except:
         R0_estimated, density, beta_max = '', '', ''
-    else:
-        R0_estimated, density, beta_max = out
 
     elapsed = dt.datetime.now() - start
     logger(f'[i] Got R0 IN {elapsed} (s)...')

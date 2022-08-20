@@ -1,7 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './styles/index.css';
-import headerBanner from './components/header';
 import InputParameters from './components/InputParams';
 import reportWebVitals from './reportWebVitals';
 

@@ -1,5 +1,5 @@
 import '../styles/app.css'
-import React, {useEffect, useRef, useState, forwardRef} from 'react';
+import React from 'react';
 
 function SimulationPanel( props ) {
 
@@ -23,11 +23,10 @@ function SimulationPanel( props ) {
     videoRef = './media/sim-out.mp4'
   }
   
-
   const simulation = require(`${videoRef}`)
   return (
       <div className='simulationPanel'> 
-          <video width="750" height="500"  src={simulation} type="video/mp4" controls> </video> 
+          <video width="800" height="650"  src={simulation} type="video/mp4" controls> </video> 
       </div>
   );
 }

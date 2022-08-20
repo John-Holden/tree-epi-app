@@ -128,65 +128,68 @@ function InputParameters() {
 
   // Render the simulation input parameter panel
   return (
-      <div className='inputParamPanel'>
-        <form onSubmit={handleSubmitResp} style={{width: 250}}>
-          <label style={labelSize}>  <strong>  Predicted <InlineMath math={secondaryR0Label}/> = {secondaryR0} </strong></label>
-          <br></br>
-          <label style={labelSize}> <strong> Tree density <InlineMath math={densityRho}/> = {density} </strong></label>
-          <p></p>
-          <label style={labelSize}>  <InlineMath math={susceptibleHosts}/> Hosts = </label>
-          <input className='inputBox' type="number" min="10" max="2000" value={hostNumber} onChange={e => setHostNumber(e.target.value)} required/>   
-          <progress value={hostNumber} max="2000"></progress> 
-          <p></p>
-          <label style={labelSize}> <InlineMath math={infectedHosts}/> Hosts = </label>
-          <input className='inputBox' type="number" min="1" max="100" value={initiallyInfected}  onChange={e => setInitiallyInfected(e.target.value)} required/> 
-          <progress value={initiallyInfected} max="100"></progress> 
-          <p></p>
-          <label style={labelSize} > <InlineMath math={infectedHosts}/> Distribution: </label> 
-          <select value={initiallyInfectedDist} onChange={e => setInitiallyInfectedDist(e.target.value)}> 
-            <option value="centralised"> Centralised</option>
-            <option value="random"> Random </option>  
-          </select>  
-          <p></p>
-          <label style={labelSize}> Infectivity <InlineMath math={infectivityBeta}/> = </label>
-          <input className='inputBox' type="number" min="0" max={infectivityUpperLim} step="1" value={infectivity}  onChange={e => setInfectivity(e.target.value)} required/>
-          <progress value={infectivity} max={infectivityUpperLim}></progress> 
-          <p></p>
-          <label style={labelSize}> Infection period = </label>
-          <input className='inputBox' type="number" min="1" max="500" value={infectiousLT}  onChange={e => setInfectiousLT(e.target.value)} required/>
-          <progress value={infectiousLT} max="500"></progress> 
-          <br></br>
-          <br></br>
-          <label style={labelSize} > Dispersal kernel: </label> 
-          <select  className='inputBoxBig' value={dispersaType} onChange={e => setDispersal(e.target.value)}> 
-            <option value="gaussian">Gaussian</option>  
-            <option value="exponential">Exponential</option>
-            <option value="power_Law">Power law</option>
-          </select>
-          <p></p>
-          <label style={labelSize}> Dispersal length (m) = </label>
-          <input className='inputBox' className='inputBox' type="number" min="1" max="2000" value={dispersalScale}  onChange={e => setDispersalScale(e.target.value)} required/>
-          <progress value={dispersalScale} max="2000"></progress> 
-          <p></p>
-          <label style={labelSize}> Domain width (m) = </label>
-          <input className='inputBox' type="number" min="10" max="5000" value={domainX}  onChange={e => setDomainX(e.target.value)} required/>
-          <progress value={domainX} max="2000"></progress> 
-          <p></p>
-          <label style={labelSize}> Domain height (m) = </label>
-          <input className='inputBox' type="number" min="10" max="5000" value={domainY}  onChange={e => setDomainY(e.target.value)} required/>   
-          <progress value={domainY} max="2000"></progress> 
-          <p></p>
-          <label style={labelSize}> Time Steps (days) = </label>
-          <input className='inputBox' type="number" min="1" max="1500" value={simulationRT}  onChange={e => setSimulationRT(e.target.value)} required/>
-          <progress value={simulationRT} max="1500"></progress> 
-          <p></p>
-          <input className='inputBoxBig' type="submit" value="Simulate"/>
-        </form>
-          {spinner &&  <Circles width="100" height="100" className='spinner'/>}
+    <div>
+      <div className="container">
+        <div className='inputParamPanel'>
+          <form onSubmit={handleSubmitResp} style={{width: 250}}>
+            <label style={labelSize}>  <strong>  Predicted <InlineMath math={secondaryR0Label}/> = {secondaryR0} </strong></label>
+            <br></br>
+            <label style={labelSize}> <strong> Tree density <InlineMath math={densityRho}/> = {density} </strong></label>
+            <p></p>
+            <label style={labelSize}>  <InlineMath math={susceptibleHosts}/> Hosts = </label>
+            <input className='inputBox' type="number" min="10" max="2000" value={hostNumber} onChange={e => setHostNumber(e.target.value)} required/>   
+            <progress value={hostNumber} max="2000"></progress> 
+            <p></p>
+            <label style={labelSize}> <InlineMath math={infectedHosts}/> Hosts = </label>
+            <input className='inputBox' type="number" min="1" max="100" value={initiallyInfected}  onChange={e => setInitiallyInfected(e.target.value)} required/> 
+            <progress value={initiallyInfected} max="100"></progress> 
+            <p></p>
+            <label style={labelSize} > <InlineMath math={infectedHosts}/> Distribution: </label> 
+            <select value={initiallyInfectedDist} onChange={e => setInitiallyInfectedDist(e.target.value)}> 
+              <option value="centralised"> Centralised</option>
+              <option value="random"> Random </option>  
+            </select>  
+            <p></p>
+            <label style={labelSize}> Infectivity <InlineMath math={infectivityBeta}/> = </label>
+            <input className='inputBox' type="number" min="0" max={infectivityUpperLim} step="1" value={infectivity}  onChange={e => setInfectivity(e.target.value)} required/>
+            <progress value={infectivity} max={infectivityUpperLim}></progress> 
+            <p></p>
+            <label style={labelSize}> Infection period = </label>
+            <input className='inputBox' type="number" min="1" max="500" value={infectiousLT}  onChange={e => setInfectiousLT(e.target.value)} required/>
+            <progress value={infectiousLT} max="500"></progress> 
+            <br></br>
+            <br></br>
+            <label style={labelSize} > Dispersal kernel: </label> 
+            <select  className='inputBoxBig' value={dispersaType} onChange={e => setDispersal(e.target.value)}> 
+              <option value="gaussian">Gaussian</option>  
+              <option value="exponential">Exponential</option>
+              <option value="power_Law">Power law</option>
+            </select>
+            <p></p>
+            <label style={labelSize}> Dispersal length (m) = </label>
+            <input className='inputBox' className='inputBox' type="number" min="1" max="2000" value={dispersalScale}  onChange={e => setDispersalScale(e.target.value)} required/>
+            <progress value={dispersalScale} max="2000"></progress> 
+            <p></p>
+            <label style={labelSize}> Domain width (m) = </label>
+            <input className='inputBox' type="number" min="10" max="5000" value={domainX}  onChange={e => setDomainX(e.target.value)} required/>
+            <progress value={domainX} max="5000"></progress> 
+            <p></p>
+            <label style={labelSize}> Domain height (m) = </label>
+            <input className='inputBox' type="number" min="10" max="5000" value={domainY}  onChange={e => setDomainY(e.target.value)} required/>   
+            <progress value={domainY} max="5000"></progress> 
+            <p></p>
+            <label style={labelSize}> Time Steps (days) = </label>
+            <input className='inputBox' type="number" min="1" max="1500" value={simulationRT}  onChange={e => setSimulationRT(e.target.value)} required/>
+            <progress value={simulationRT} max="1000"></progress> 
+            <p></p>
+            <input className='inputBoxBig' type="submit" value="Simulate"/>
+          </form>
+          {spinner &&  <Circles width="80" height="80" className='spinner'/>}
+        </div>
         <div className='simulationPanel'>
           <SimulationPanel className='simulationPanel' videoRefData={videoRefData}/>
         </div>
-        <div className='plots'>
+        <div className='plot1'>
         <Plot
             data={[
               {
@@ -253,6 +256,7 @@ function InputParameters() {
           />
         </div>
       </div>
+    </div>
   );
 }
 
