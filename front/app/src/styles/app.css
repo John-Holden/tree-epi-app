@@ -47,10 +47,15 @@ code {
   flex: 0.25;  
   font-size: large;
   text-align: left;
+  /* align-self: stretch; */
 }
 
 .simulationPanel{
   flex: 0.15;
+  height: 600px;
+  justify-content: stretch;
+  /* align-self: flex-start; */
+  /* align-self: stretch; */
 }
 
 .plot1{

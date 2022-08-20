@@ -220,7 +220,7 @@ function InputParameters() {
                 automargin: true,
               },
             ]}
-            layout={ {width: 600, height: 400, title: 'SIR fields'} }
+            layout={ {width: 600, height: 400, title: 'SIR fields', xaxis:{title:"time"}, yaxis:{title:"host number"} } }
           />
           <Plot
             data={[
