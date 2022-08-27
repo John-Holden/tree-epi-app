@@ -263,16 +263,19 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
         # Run simulation & plotting concurrently in a bid to speed things up...
 
         sim_handler.Execute(sim_name)
-        sim_ref = animate_plt(sim_name, sim_context)
+        sim_ref = animate_plt(sim_name)
         # parallel_anim([sim_name, sim_context])
 
         # Load time series output
         S = np.loadtxt(open(f"{sim_name}/S_t.csv", "rb"), delimiter=",").astype(int)
         I = np.loadtxt(open(f"{sim_name}/I_t.csv", "rb"), delimiter=",").astype(int)
         R = np.loadtxt(open(f"{sim_name}/R_t.csv", "rb"), delimiter=",").astype(int)
+        R0 = np.loadtxt(open(f"{sim_name}/R0_avg.csv", "rb"), delimiter=",").astype(float)
         S = [int(i) for i in S]
         I = [int(i) for i in I]
         R = [int(i) for i in R]
+        R0_avg = [i for i in R0]
+        R0_gen = [i for i in range(len(R0))]
 
         elapsed = dt.datetime.now() - start
         logger(f'execute_cpp_SIR - finished in {elapsed} (s)')
@@ -283,10 +286,10 @@ def execute_cpp_SIR(sim_context: GenericSimulationConfig, save_options: SaveOpti
         raise e
 
     # Remove directory where sim output data is stored 
-    shutil.rmtree(sim_name)
+    # shutil.rmtree(sim_name)
 
     # Return output in same format as other sim functions
-    return {"S": S, "I" : I, "R": R, "sim_ref": sim_ref} 
+    return {"S": S, "I" : I, "R": R, "R0_avg": R0_avg, "R0_gen": R0_gen, "sim_ref": sim_ref} 
 
 
 
@@ -323,7 +326,7 @@ def parallel_anim(anim_args: List) -> None:
     return
 
 
-def animate_plt(sim_location: str, sim_context: GenericSimulationConfig):
+def animate_plt(sim_location: str):
     print("[i] Animating plots")
 
     anim_path = get_env_var('ANIM_SAVE_DEST')
@@ -333,15 +336,11 @@ def animate_plt(sim_location: str, sim_context: GenericSimulationConfig):
     pos_y = np.loadtxt(open(f"{sim_location}/pos_y.csv", "rb"), delimiter=",").astype(int)
     files = os.listdir(sim_location)
     files = sorted([file for file in files if "stat_" in file])
-    # times = [file.split('_')[1].replace(".csv", "") for file in files]
+
     state0 = np.genfromtxt(open(f"{sim_location}/{files[0]}", "r")).astype(int)
     os.remove(f"{sim_location}/{files[0]}")
     files = files[1:]
 
-    domain = sim_context.domain_config.patch_size
-    aspect_ratio = float(domain[0] / domain[1])
-    print('domain ', domain)
-    print('aspect ratio', aspect_ratio)
     # Matplotlib style fixture
     pltParams = {'figure.figsize': (7.5, 5),
                 'axes.labelsize': 15,
@@ -361,9 +360,6 @@ def animate_plt(sim_location: str, sim_context: GenericSimulationConfig):
     colors = ['xkcd:green', "xkcd:red", 'xkcd:black']
     cmap = ListedColormap(colors)
     scat = ax.scatter(pos_x, pos_y, c=state0, cmap=cmap, s=17, vmin=1, vmax=3)
-
-    # title = ax.text(0.10 ,1.1, "", bbox={'facecolor':'w', 'alpha':0.5, 'pad':5},
-    #             transform=ax.transAxes, ha="center")
 
     title = ax.annotate(rf"$t$ = 0", xy=(0.5, 0.99), xycoords='axes fraction', fontsize=9,
                 horizontalalignment='right', verticalalignment='bottom', bbox={'facecolor':'w', 'alpha':0.5, 'pad':5})

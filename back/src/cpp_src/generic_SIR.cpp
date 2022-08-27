@@ -6,6 +6,7 @@
 #include <fstream>
 #include <jsoncpp/json/json.h>
 #include <vector>
+#include <tuple>
 
 using namespace std;
 using std::vector;
@@ -25,20 +26,32 @@ class Simulation{
             vector<int> stat {LoadField( std :: string(SimInputPath) + "/stat.csv") };
             vector<int> inf_l_count(pos_x.size(), 0); // time becoming infected
             vector<int> S, I, R;  // record evolution of fields in time
+            vector<int> R0generation(pos_x.size(), 0); // time becoming infected
+            vector <int> infectionCount(pos_x.size(), 0 ); // number of infections
 
-            int steps = ParamRoot["runtime"]["steps"].asInt();
-            int hostNumber = pos_x.size();
             bool exceededSteps = false;
+            int hostNumber = pos_x.size();
+            int steps = ParamRoot["runtime"]["steps"].asInt();
+
+            // initialise R0 generation 
+            for (int index=0;  index<R0generation.size(); index++) {
+                if (stat[index] != 2) {
+                    continue;
+                }
+                R0generation[index] = 1;
+            }
 
             // iterate over steps
             cout << "[i] Computing " << steps << " steps" << endl;
             for (int t=0; t<steps; t++){
+                set <int> newInfected;
+                vector <int> newR0gen, newInfCount;
 
                 S.push_back(susceptibleNumber(stat));
                 I.push_back(infectedNumber(stat));
                 R.push_back(removedNumber(stat));
 
-                writeField(stat, string(SimInputPath) + "/stat_" + frameLabel(t) + ".csv");                                            
+                writeFieldInt(stat, string(SimInputPath) + "/stat_" + frameLabel(t) + ".csv");                                            
 
                 // update removed status
                 vector<int> newRem = getNewRemoved(t, inf_l, inf_l_count, stat);
@@ -47,28 +60,47 @@ class Simulation{
                     }   
 
                 if (isExinction(stat)) {
-                    cout << "[i] Exiting, no infecteds remain @t " << t << endl;
+                    cout << "[i] Exiting, no infecteds remain @t " << t + 1 << endl;
                     break;
                 }
 
                 // update infection status
-                set<int> newInf = getNewInfected(pos_x, pos_y, inf_l, stat, ParamRoot);
-                for (auto index : newInf) {
+                tie(newInfected, newR0gen, newInfCount) = getNewInfected(pos_x, pos_y, inf_l, stat, ParamRoot, R0generation);
+
+                // newly infected
+                for (auto index : newInfected) {
                     stat[index] = 2;
                     inf_l_count[index] = t;
                     }
+
+                for (int index=0; index<hostNumber; index++){
+                    // update infected generations
+                    if (newR0gen[index]) {
+                        R0generation[index] = newR0gen[index];
+                    }
+                    // update infected count
+                    if (newInfCount[index]) {
+                        infectionCount[index] += newInfCount[index];
+                    }
+                }
                 
                 if (isTimeHorizon(t, steps)) {
-                    cout << "[i] Exiting, exceeded the time horizon @t " << t << endl;
+                    cout << "[i] Exiting, exceeded the time horizon @t " << t + 1 << endl;
                     exceededSteps = true;
                    }
             }
 
             cout << "[i] Finished computing simulation." << endl;
             writeEnd(SimInputPath);
-            writeField(S, string(SimInputPath) + "/S_t" + ".csv");
-            writeField(I, string(SimInputPath) + "/I_t" + ".csv");
-            writeField(R, string(SimInputPath) + "/R_t" + ".csv");                            
+            // process R0 infection count gen
+            vector <float> R0avg;
+            R0avg = getAvgR0(R0generation, infectionCount);                       
+            writeFieldFloat(R0avg, string(SimInputPath) + "/R0_avg.csv");
+            // save SIR
+            writeFieldInt(S, string(SimInputPath) + "/S_t.csv");
+            writeFieldInt(I, string(SimInputPath) + "/I_t.csv");
+            writeFieldInt(R, string(SimInputPath) + "/R_t.csv");     
+
             return 0;
         }
 };

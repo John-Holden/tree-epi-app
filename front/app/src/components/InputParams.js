@@ -37,7 +37,8 @@ function InputParameters() {
  const [I_field, setI_field] = useState([0])
  const [R_field, setR_field] = useState([0])
  const [t_field, setT_field] = useState([0])
-
+ const [R0_gen, setR0_gen] = useState([0.00])
+ const [R0_avg, setR0_avg] = useState([0.00])
 
   // Update R0 value, conditional on density, infectivity, & infectious lifetime 
  let updateEpiState = async () => {
@@ -77,7 +78,6 @@ function InputParameters() {
  let handleSubmitResp = async (e) => {
     
     if (initiallyInfected > hostNumber) {
-      console.log('here')
       alert('The number of infected hosts is larger than the number of susceptibles!')
       return
     }
@@ -106,6 +106,8 @@ function InputParameters() {
         setI_field(jsonData['I'])
         setR_field(jsonData['R'])
         setT_field(jsonData['t'])
+        setR0_gen(jsonData['R0_gen'])
+        setR0_avg(jsonData['R0_avg'])
       }
 
       res.json().then(data => {updateOutState(data)})
@@ -167,7 +169,7 @@ function InputParameters() {
             </select>
             <p></p>
             <label style={labelSize}> Dispersal length (m) = </label>
-            <input className='inputBox' className='inputBox' type="number" min="1" max="2000" value={dispersalScale}  onChange={e => setDispersalScale(e.target.value)} required/>
+            <input className='inputBox' type="number" min="1" max="2000" value={dispersalScale}  onChange={e => setDispersalScale(e.target.value)} required/>
             <progress value={dispersalScale} max="2000"></progress> 
             <p></p>
             <label style={labelSize}> Domain width (m) = </label>
@@ -225,34 +227,16 @@ function InputParameters() {
           <Plot
             data={[
               {
-                x: t_field,
-                y: S_field,
+                x: R0_gen,
+                y: R0_avg,
                 type: 'scatter',
                 mode: 'lines+markers',
                 marker: {color: 'green'},
-                name: 'S',
-                automargin: true,
-              },
-              {
-                x: t_field,
-                y: I_field,
-                type: 'scatter',
-                mode: 'lines+markers',
-                marker: {color: 'red'},
-                name: 'I',
-                automargin: true,
-              },
-              {
-                x: t_field,
-                y: R_field,
-                type: 'scatter',
-                mode: 'lines+markers',
-                marker: {color: 'black'},
-                name: 'R',
+                name: 'avg R0',
                 automargin: true,
               },
             ]}
-            layout={ {width: 600, height: 400, title: 'SIR fields'} }
+            layout={ {width: 600, height: 400, title: "Average Secondary Infections", xaxis:{title:"generation"}, yaxis:{title:"Avg R0"}} }
           />
         </div>
       </div>

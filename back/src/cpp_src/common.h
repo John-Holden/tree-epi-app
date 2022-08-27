@@ -53,15 +53,13 @@ vector<int> LoadField(string SimName)
                 index ++;
             }    
     }
-
-    // todo multi dim array? vector<vector<int>> S = { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} };
     
     return dataField;
 }
 
 
-// write vector v to text.txt
-void writeField(vector<int> v, string saveName){
+//ints - write vector v to text.txt
+void writeFieldInt(vector<int> v, string saveName){
 	ofstream file;
 	file.open(saveName);
 	for(int i=0;i<v.size();++i){
@@ -70,6 +68,15 @@ void writeField(vector<int> v, string saveName){
 	file.close();
 }
 
+// floats - write vector v to text.txt
+void writeFieldFloat(vector<float> v, string saveName){
+	ofstream file;
+	file.open(saveName);
+	for(int i=0;i<v.size();++i){
+		file<<v[i]<<"\n";
+	}  
+	file.close();
+}
 
 // stupid func to signal end of sim
 void writeEnd(string SimName) {

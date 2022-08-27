@@ -67,11 +67,12 @@ def simulation_request_handler():
     try:
         output = simulate(sim_config, save_options, rt_settings)
         logger('[i] Finished succesful simulation')
-
         return make_response(jsonify(video_ref=output['sim_ref'], 
                                      S=output['S'], 
                                      I=output['I'], 
                                      R=output['R'],
+                                     R0_gen=output["R0_gen"],
+                                     R0_avg=output["R0_avg"],
                                      t=[i for i in range(len(output['S']))]), 200)
     except Exception as e:
         logger(f'[e] Simulation failed: {e}')

@@ -113,7 +113,7 @@ def write_simulation_params(sim_context: GenericSimulationConfig, save_options: 
     """
     
     sim_write_loc = f'{PATH_TO_TEMP_CPP_STORE}{dt.datetime.now().strftime("%d%m%Y%H%M%S")}'
-    logger('[i] Writing sim parameters & config to: {PATH_TO_TEMP_CPP_STORE}')
+    logger(f"[i] Writing sim parameters & config to: {sim_write_loc}")
 
     if os.path.exists(sim_write_loc):
         raise Exception(f'Path {sim_write_loc} already exists!')

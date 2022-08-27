@@ -5,6 +5,7 @@
 #include <jsoncpp/json/json.h>
 #include <math.h>       /* sqrt */
 #include <set>
+#include <tuple>
 
 using namespace std; // use all std object names etc. 
 using std :: vector;
@@ -70,22 +71,25 @@ bool isInfected(float infectPr) {
 
 
 // Find newly infected trees, return array with update infection states 
-set <int> getNewInfected(vector <int> xPos, vector <int> yPos, vector <int> Ilt, vector <int> stat, Json::Value simContext) {
+std::tuple<set<int>, vector<int>, vector<int>>  getNewInfected(vector <int> xPos, vector <int> yPos, 
+                                                  vector <int> Ilt, vector <int> stat, 
+                                                  Json::Value simContext, vector <int> R0gen ) {
     
     // init variables     
     int numHosts = xPos.size();
     float dist, pr;
     set<int> newInfected;
-
+    vector<int> newR0gen (stat.size(), 0);
+    vector <int> newInfCount(xPos.size(), 0);
 
     // fields have values: S == 1 && I == 2 && R == 3
     for (int index=0; index<numHosts; index++) {
-        // skip anything not infected
+        //  iterate over infected - i.e. skip anything not infected 
         if ( stat[index] != 2 ) {
             continue;  
         }
 
-        // get new infections due to i^th infected tree
+        // iterate over susceptibles & get new infections
         for (int index1=0; index1<numHosts; index1++) {
             
             // skip self-infections
@@ -108,10 +112,13 @@ set <int> getNewInfected(vector <int> xPos, vector <int> yPos, vector <int> Ilt,
             
             // new transition S --> I
             newInfected.insert(index1);
+            // update R0 gen
+            newInfCount[index] += 1;
+            newR0gen[index1] = R0gen[index] + 1;
         }
     }
- 
-    return newInfected;
+
+    return {newInfected, newR0gen, newInfCount};
 }
 
 
@@ -194,4 +201,43 @@ for (int i=0; i < stat.size(); i++) {
     count++;
 }
 return count;
+}
+
+// calcualte & return average R0 for each generation
+vector <float> getAvgR0(vector<int> R0Gen, vector<int> infCount) {
+    int maxGen = 0;
+    int maxGenUpper = 50;
+    vector <int> R0GenNumb(maxGenUpper, 0);
+    vector <int> R0GenCount(maxGenUpper, 0);
+    vector <float> avgR0;
+
+    for (int index=0; index < R0Gen.size(); index++) {
+        
+        // gen 0 means uninfected susceptible
+        if (!R0Gen[index]) {
+            continue;
+        }
+
+        // record maximum generation
+        if (R0Gen[index] > maxGen) {
+            maxGen = R0Gen[index];
+        } 
+
+        // cumulative sum of all infections by generation
+        R0GenNumb[R0Gen[index] - 1] += 1;
+        R0GenCount[R0Gen[index] - 1] += infCount[index];  
+    }
+    
+    // divide number of secondary infection for generation by number of infecteds
+    for (int index=0; index < maxGenUpper; index++) {
+        // break at the first zero count
+        if ( !R0GenCount[index] ) {
+            break;
+        }
+        
+        float avgROgen = static_cast<float> (R0GenCount[index]) / static_cast<float> (R0GenNumb[index]);
+        avgR0.push_back(avgROgen);
+    }
+
+    return avgR0;
 }
