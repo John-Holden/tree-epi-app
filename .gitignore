@@ -7,3 +7,5 @@ node_modules
 venv
 *.mp4
 .pdf
+terraform*
+.terraform.*
