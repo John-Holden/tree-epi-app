@@ -44,6 +44,10 @@ key_name      =  aws_key_pair.ssh_key.key_name
 tags          = {
   Name        = "My EC2 instance",
   }
+
+root_block_device {
+    volume_size = 20
+  }
 }
 
 resource "aws_eip" "lb" {

@@ -14,19 +14,19 @@ help: ## This help.
 
 # Build the containers from scratch
 build: ## Build the release and develoment container. Args: frontend | backend
-	docker-compose build --no-cache ${SERVICE}
+	docker compose build --no-cache ${SERVICE}
 
 quick-build:
-	docker-compose build ${SERVICE}
+	docker compose build ${SERVICE}
 
 up-non-d: ## Run containers in non-detached mode
-	docker-compose up ${SERVICE}
+	docker compose up ${SERVICE}
 
 up: ## Run containers in detached mode by default
-	docker-compose up -d ${SERVICE}
+	docker compose up -d ${SERVICE}
 
 stop: ## Stop all docker containers
-	docker-compose stop ${SERVICE}
+	docker compose stop ${SERVICE}
 
 rebuild-front: ## Rebuild react app, build new image & run frontend container in detached mode
 	make stop SERVICE=frontend
