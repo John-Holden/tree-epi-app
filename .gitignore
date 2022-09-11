@@ -5,7 +5,7 @@ __pycache__/
 node_modules
 .idea
 venv
-*.mp4
+2*.mp4
 .pdf
 terraform*
 .terraform.*

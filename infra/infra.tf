@@ -38,7 +38,7 @@ resource "aws_network_interface" "web_interface" {
 # TODO make me bigger!!
 resource "aws_instance" "webserver" {
 ami           = "ami-0da3823b95bf63c23" //Ubuntu AMI
-instance_type = "t2.micro"
+instance_type = "t2.large"
 subnet_id     = aws_subnet.subnet.id
 key_name      =  aws_key_pair.ssh_key.key_name
 tags          = {
@@ -73,8 +73,8 @@ ingress {
     ]
   }
   ingress {
-    from_port = 80
-    to_port   = 80
+    from_port = 3000
+    to_port   = 3000
     protocol  = "tcp"
     cidr_blocks = [
       "0.0.0.0/0"
