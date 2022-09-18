@@ -20,14 +20,21 @@ class Simulation{
              
             cout << "[i] Entered into cpp binary. Loading inputs..." << endl;
             Json::Value ParamRoot {LoadJson(SimInputPath)};
+            // vector of position x & y coordinates
             vector<int> pos_x {LoadField( std :: string(SimInputPath) + "/pos_x.csv") };
             vector<int> pos_y {LoadField( std :: string(SimInputPath) + "/pos_y.csv") };
+            // vector of infected pre-calculated lifetimes 
             vector<int> inf_l {LoadField( std :: string(SimInputPath) + "/inf_lt.csv") };
+            // vector of tree states with integer vaules: S == 1 && I == 2 && R == 3 
             vector<int> stat {LoadField( std :: string(SimInputPath) + "/stat.csv") };
-            vector<int> inf_l_count(pos_x.size(), 0); // time becoming infected
-            vector<int> S, I, R;  // record evolution of fields in time
-            vector<int> R0generation(pos_x.size(), 0); // time becoming infected
-            vector <int> infectionCount(pos_x.size(), 0 ); // number of infections
+            // time becoming infected
+            vector<int> inf_l_count(pos_x.size(), 0); 
+            // a record of the number of trees in compartments S, I, & R
+            vector<int> S, I, R;  
+            // Generation R0 infection
+            vector<int> R0generation(pos_x.size(), 0);
+            // number of infections caused by i^th tree
+            vector <int> infectionCount(pos_x.size(), 0 ); 
 
             bool exceededSteps = false;
             int hostNumber = pos_x.size();
@@ -38,15 +45,17 @@ class Simulation{
                 if (stat[index] != 2) {
                     continue;
                 }
+                // infected trees @t-0 have vaule 1
                 R0generation[index] = 1;
             }
 
-            // iterate over steps
+            // iterate over time steps
             cout << "[i] Computing " << steps << " steps" << endl;
             for (int t=0; t<steps; t++){
                 set <int> newInfected;
                 vector <int> newR0gen, newInfCount;
 
+                // update number of trees in compartments etc.
                 S.push_back(susceptibleNumber(stat));
                 I.push_back(infectedNumber(stat));
                 R.push_back(removedNumber(stat));
@@ -64,10 +73,10 @@ class Simulation{
                     break;
                 }
 
-                // update infection status
+                // update infection status of each tree
                 tie(newInfected, newR0gen, newInfCount) = getNewInfected(pos_x, pos_y, inf_l, stat, ParamRoot, R0generation);
 
-                // newly infected
+                // update newly infected
                 for (auto index : newInfected) {
                     stat[index] = 2;
                     inf_l_count[index] = t;
@@ -110,4 +119,3 @@ extern "C" {
     Simulation* newSimOjb(){ return new Simulation(); }
     int execute(Simulation* simulation, char* SimPath){ return simulation->Execute(SimPath); }
     }
-// 
