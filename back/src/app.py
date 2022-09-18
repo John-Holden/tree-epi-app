@@ -106,7 +106,7 @@ def get_R0():
 
 
 @app.route("/healthcheck", methods=['GET'])
-def get_R0():
+def healthcheck():
     """
     AWS LB heath checks
     """

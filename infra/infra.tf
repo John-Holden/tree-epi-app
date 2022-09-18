@@ -225,7 +225,7 @@ resource "aws_alb_target_group_attachment" "tgattachment" {
 
 resource "aws_instance" "webserver" {
 ami           = "ami-0aca9de1791dcec2a" // Deb-11
-instance_type = "t2.small"
+instance_type = "t2.medium"
 subnet_id     = aws_subnet.sb_a.id
 key_name      =  aws_key_pair.ssh_key.key_name
 tags          = {
