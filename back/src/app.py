@@ -105,6 +105,14 @@ def get_R0():
         return make_response(jsonify(error=f'{e}'), 500)
 
 
+@app.route("/healthcheck", methods=['GET'])
+def get_R0():
+    """
+    AWS LB heath checks
+    """
+    make_response(jsonify(200))
+
+
 @app.errorhandler(404)
 def resource_not_found():
     return make_response(jsonify(error='Not found - homie!'), 404)
