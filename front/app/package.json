@@ -31,7 +31,7 @@
     "eject": "react-scripts eject",
     "build-dev": "env-cmd -f envs/.env.dev react-scripts build",
     "start-dev": "env-cmd -f envs/.env.dev react-scripts start",
-    "start-docker-dev": "env-cmd -f envs/.env.docker react-scripts start PORT=80",
+    "start-docker-dev": "env-cmd -f envs/.env.docker react-scripts start",
     "build-docker-dev": "env-cmd -f envs/.env.docker react-scripts build",
     "build-prod": "env-cmd -f envs/.env.prod react-scripts build",
     "start-prod": "env-cmd -f envs/.env.prod react-scripts start"
