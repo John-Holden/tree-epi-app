@@ -17,9 +17,9 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-#####################################################
-# Define base networking, vpc & subnets
-#####################################################
+# #####################################################
+# # Define base networking, vpc & subnets
+# #####################################################
 
 resource "aws_vpc" "main" {
   cidr_block = "172.16.0.0/16"
@@ -123,6 +123,22 @@ resource "aws_security_group" "tree_epi_alb" {
   ingress {
     from_port   = 80
     to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow FE docker to BE docker 
+ingress {
+    from_port   = 3000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow FE docker to BE docker 
+ingress {
+    from_port   = 80
+    to_port     = 5000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
